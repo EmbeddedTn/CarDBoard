@@ -1,5 +1,5 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
-#include "HAL_I2C.h"
+#include "../include/HAL_I2C.h"
 
 
 /* I2C Master Configuration Parameter */

@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 // file containing global variable with slb_image
-#include "slb.h"
+#include "../include/slb.h"
 
 /* Graphic library context */
 Graphics_Context g_sContext;

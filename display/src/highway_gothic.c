@@ -4,7 +4,7 @@
  * Opts: 
  ******************************************************************************/
 
-#include "font.h"
+#include "../include/font.h"
 
 #ifndef HIGHWAY_GOTHIC
 #define HIGHWAY_GOTHIC 1
