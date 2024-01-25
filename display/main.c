@@ -11,6 +11,7 @@
 // file containing global variable with slb_image
 #include "slb.h"
 
+// file including the font WIP
 #include "font.h"
 
 // Useful defines
@@ -19,6 +20,7 @@
 /* Graphic library context */
 Graphics_Context g_sContext;
 
+// WIP
 uint16_t font_offset[] = {0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512, 528, 544, 560, 576, 592, 608, 624, 640, 656, 672, 688, 704, 720, 736, 752, 768, 784, 800, 816, 832, 848, 864, 880, 896, 912, 928, 944, 960, 976, 992, 1008, 1024, 1040, 1056, 1072, 1088, 1104, 1120, 1136, 1152, 1168, 1184, 1200, 1216, 1232, 1248, 1264, 1280, 1296, 1312, 1328, 1344, 1360, 1376, 1392, 1408, 1424, 1440, 1456, 1472, 1488, 1504, 1520};
 const Graphics_Font highway_font = {
                       FONT_FMT_UNCOMPRESSED,
@@ -30,13 +32,14 @@ const Graphics_Font highway_font = {
               };
 
 uint8_t current_speed = 0;
-
 int32_t slide_value = SCREEN_MAXWIDTH;
 
 
-/* Variable for storing temperature value returned from TMP006 */
-float temp;
+#define PAGES 3
+int current_page_number = 0;
 
+
+/* Variable for storing temperature value returned from TMP006 */
 void _graphicsInit()
 {
     /* Initializes display */
@@ -130,23 +133,56 @@ void _adcInit(){
         ADC14_toggleConversionTrigger();
 }
 
+// WIP
 void initFont() {
-
-    Graphics_setFont(&g_sContext, &highway_font);
+    // Graphics_setFont(&g_sContext, &highway_font);
 }
 
+int8_t* speed_from_int(int speed) {
+    switch (speed) {
+    case 30:
+        return "30";
+    case 40:
+        return "40";
+    case 50:
+        return "50";
+    case 60:
+        return "60";
+    case 70:
+        return "70";
+    case 90:
+        return "90";
+    case 110:
+        return "110";
+    case 130:
+        return "130";
+    default:
+        return "No Limit";
+    }
+}
+
+void draw_speed_limit(int speed_int) {
+    int8_t* speed = speed_from_int(speed_int);
+    Graphics_drawImage(&g_sContext, &slb_image, 0, 0);
+    Graphics_drawStringCentered(&g_sContext, speed, 3, 64, 64, OPAQUE_TEXT);
+}
+
+// Select the page to draw to the screen
 void drawPage(uint8_t page_number) {
     //GrContextForegroundSet(&g_sContext, ClrBlack);
     switch (page_number) {
     case 0:
-        Graphics_drawImage(&g_sContext, &slb_image, 0, 0);
-        Graphics_drawStringCentered(&g_sContext, "130", 3, 64, 64, OPAQUE_TEXT);
+        draw_speed_limit(current_speed);
         break;
     default:
         Graphics_drawImage(&g_sContext, &slb_image, 0, 0);
         break;
     }
 
+}
+
+void change_page() {
+    current_page_number = ++current_page_number % PAGES;
 }
 
 /*
