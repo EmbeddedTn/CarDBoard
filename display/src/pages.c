@@ -10,8 +10,8 @@
 /* Graphic library context */
 Graphics_Context g_sContext;
 
-
-uint8_t current_speed = 0;
+// this should be received from the OSM api
+uint8_t current_speed = 130;
 
 #define PAGES 3
 int current_page_number = 0;
@@ -35,7 +35,7 @@ int8_t* speed_from_int(int speed) {
     case 130:
         return "130";
     default:
-        return "No Limit";
+        return "NaN";
     }
 }
 
@@ -46,20 +46,33 @@ void draw_speed_limit(int speed_int) {
 }
 
 // Select the page to draw to the screen
-void draw_page(uint8_t page_number) {
-    //GrContextForegroundSet(&g_sContext, ClrBlack);
+void draw_page(int8_t page_number) {
     switch (page_number) {
     case 0:
         draw_speed_limit(current_speed);
+        Graphics_drawString(&g_sContext, "Speed Limit", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+
+        break;
+    case 1:
+        Graphics_clearDisplay(&g_sContext);
+        Graphics_drawString(&g_sContext, "Vehicle Tilt", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+
+        break;
+    case 2:
+        Graphics_clearDisplay(&g_sContext);
+        Graphics_drawString(&g_sContext, "Geolocation", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+
         break;
     default:
-        Graphics_drawImage(&g_sContext, &slb_image, 0, 0);
+        Graphics_clearDisplay(&g_sContext);
+        Graphics_drawString(&g_sContext, "Err", AUTO_STRING_LENGTH, 11, 5, OPAQUE_TEXT);
+
         break;
     }
 
 }
 
 void change_page(int delta) {
-    current_page_number = (current_page_number + delta) % PAGES;
+    current_page_number = abs(current_page_number + delta) % PAGES;
     draw_page(current_page_number);
 }
