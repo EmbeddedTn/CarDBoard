@@ -1,5 +1,5 @@
-# embedded_project
-Project for the Embedded Software for the Internet of Things UniTn course
+# Car Dashboard
+Project for the Embedded Systems for the Internet of Things  [UniTn - 145996]
 
 ## Idea
 Car Dashboard with speed indicator, street sign and speed limit display.
@@ -7,8 +7,17 @@ Future idea -> parking sensors
 
 ## Libraries used
 - LVGL
+- TinyGPS++
+- ArduinoJSON
 - ...
 
 # Useful documentation
 - [DriverLib](https://schaumont.dyn.wpi.edu/ece4703b21/_downloads/7a8fc22c23fd2706dfd4d3f5256fad98/msp432-driverlib-user.pdf)
 - [Joystick](https://www.ti.com/lit/ug/slau599b/slau599b.pdf?ts=1698864546827&ref_url=https%253A%252F%252Fwww.ti.com%252Ftool%252FBOOSTXL-EDUMKII)
+- [Reverse Geocoding for OpenStreetMap](https://nominatim.org/release-docs/develop/api/Reverse/)
+
+### Authors
+- Lorenzo Bodini <lorenzo.bodini@studenti.unitn.it>
+- Filippo De Grandi <filippo.degrandi@studenti.unitn.it>
+- Lorenzo Pattaro Zonta <lorenzo.pattarozonta@studenti.unitn.it>
+- Elia Zonta <elia.zonta@studenti.unitn.it>
