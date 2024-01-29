@@ -4,19 +4,21 @@
 #include <stdio.h>
 #include <stdint.h>
 
-// file containing global variable with slb_image
+// file containing the speed limit background image
 #include "../include/slb.h"
 
 /* Graphic library context */
 Graphics_Context g_sContext;
 
-// this should be received from the OSM api
-uint8_t current_speed = 130;
+#define PAGES 4
 
-#define PAGES 3
-int current_page_number = 0;
+// Global variables
+static uint16_t joystickBuffer[2];
 
-int8_t* speed_from_int(int speed) {
+uint8_t current_page_number = 0;
+int16_t current_speed = 130;
+
+int8_t* speed_from_int(int16_t speed) {
     switch (speed) {
     case 30:
         return "30";
@@ -39,15 +41,15 @@ int8_t* speed_from_int(int speed) {
     }
 }
 
-void draw_speed_limit(int speed_int) {
+void draw_speed_limit(int16_t speed_int) {
     int8_t* speed = speed_from_int(speed_int);
     Graphics_drawImage(&g_sContext, &slb_image, 0, 0);
     Graphics_drawStringCentered(&g_sContext, speed, 3, 64, 64, OPAQUE_TEXT);
 }
 
 // Select the page to draw to the screen
-void draw_page(int8_t page_number) {
-    switch (page_number) {
+void draw_page() {
+    switch (current_page_number) {
     case 0:
         draw_speed_limit(current_speed);
         Graphics_drawString(&g_sContext, "Speed Limit", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
@@ -60,19 +62,80 @@ void draw_page(int8_t page_number) {
         break;
     case 2:
         Graphics_clearDisplay(&g_sContext);
+        Graphics_drawString(&g_sContext, "Speed", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+
+        break;
+    case 3:
+        Graphics_clearDisplay(&g_sContext);
         Graphics_drawString(&g_sContext, "Geolocation", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
 
         break;
     default:
         Graphics_clearDisplay(&g_sContext);
-        Graphics_drawString(&g_sContext, "Err", AUTO_STRING_LENGTH, 11, 5, OPAQUE_TEXT);
+        Graphics_drawString(&g_sContext, "Err", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
 
         break;
     }
 
 }
 
-void change_page(int delta) {
+// function called when buttons S1 or S2 are pressed
+void change_page(int8_t delta) {
     current_page_number = abs(current_page_number + delta) % PAGES;
-    draw_page(current_page_number);
+    draw_page();
 }
+
+// Function to call on speed_limit change
+void update_speed_limit(int16_t speed_limit) {
+    current_speed = speed_limit;
+    draw_page();
+}
+
+bool isInIdleState(int x){
+    return ((x>7000) && (x<9000));
+}
+
+// Joystick interrupt
+void ADC14_IRQHandler(void){
+    uint64_t status;
+    status = ADC14_getEnabledInterruptStatus();
+    ADC14_clearInterruptFlag(status);
+
+    //Joystick reading finished
+    if(status & ADC_INT1){ //Conversion is over
+        joystickBuffer[0] = ADC14_getResult(ADC_MEM0);
+        joystickBuffer[1] = ADC14_getResult(ADC_MEM1);
+
+        // change page by checking x axis joystick value
+        if(!isInIdleState(joystickBuffer[0])){
+            if(joystickBuffer[0] > 14000){
+                change_page(1);
+            }
+            if(joystickBuffer[0] < 2500){
+                change_page(-1);
+            }
+        }
+    }
+}
+
+// Button S1 interrupt
+void PORT5_IRQHandler(){
+    uint_fast16_t status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P5);
+    GPIO_clearInterruptFlag(GPIO_PORT_P5,status);
+    if (status & GPIO_PIN1){
+        change_page(1);
+    }
+}
+
+void PORT3_IRQHandler(){
+    uint_fast16_t status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P3);
+    GPIO_clearInterruptFlag(GPIO_PORT_P3,status);
+    if (status & GPIO_PIN5){
+        change_page(-1);
+    }
+}
+
+
+
+
+

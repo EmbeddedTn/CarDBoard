@@ -9,6 +9,8 @@ int8_t* speed_from_int(int speed);
 void draw_speed_limit(int speed_int);
 void draw_page(uint8_t page_number);
 void change_page(int delta);
+void update_speed_limit(int speed_limit);
+void ADC14_IRQHandler(void);
 
 
 #endif /* PAGES_H_ */
