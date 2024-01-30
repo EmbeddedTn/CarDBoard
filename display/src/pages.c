@@ -7,7 +7,7 @@
 // file initializing the speed limit background image
 #include "../include/slb.h"
 
-/* Graphic library context */
+// Graphic library context
 Graphics_Context g_sContext;
 
 #define SPEED_FONT g_sFontCmss30b
@@ -19,7 +19,7 @@ static uint16_t joystickBuffer[2];
 
 uint8_t current_page_number = 0;
 int16_t current_speed_limit = 69;
-int16_t current_speed = 4.20;
+int16_t current_speed = 12;
 
 int8_t* speed_from_int(int16_t speed) {
     int8_t* str = (int8_t*)malloc(3 * sizeof(int8_t));
@@ -38,10 +38,28 @@ void draw_speed_limit() {
 
 void draw_speed() {
     int8_t* speed = speed_from_int(current_speed);
+    int COLOR;
+
+    // Checking if over speed limit
+    if (current_speed > current_speed_limit) {
+        COLOR = GRAPHICS_COLOR_RED;
+    } else if (abs(current_speed - current_speed_limit) < 5) {
+        COLOR = GRAPHICS_COLOR_ORANGE;
+    } else {
+        COLOR = GRAPHICS_COLOR_GREEN;
+    }
 
     Graphics_setFont(&g_sContext, &SPEED_FONT);
-    Graphics_drawStringCentered(&g_sContext, speed, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
+
+    Graphics_setForegroundColor(&g_sContext, COLOR);
+    Graphics_setBackgroundColor(&g_sContext, COLOR);
+    Graphics_drawStringCentered(&g_sContext, "        ", AUTO_STRING_LENGTH, 64, 112, OPAQUE_TEXT);
+    Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_BLACK);
+    Graphics_setBackgroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
+
     Graphics_setFont(&g_sContext, &DEFAULT_FONT);
+    Graphics_drawStringCentered(&g_sContext, "Km/h", AUTO_STRING_LENGTH, 80, 64, OPAQUE_TEXT);
 }
 
 // Select the page to draw to the screen
