@@ -7,9 +7,6 @@
 // file initializing the speed limit background image
 #include "../include/slb.h"
 
-// Graphic library context
-Graphics_Context g_sContext;
-
 #define SPEED_FONT g_sFontCmss30b
 #define TITLE_FONT g_sFontCmss12b
 #define DEFAULT_FONT g_sFontCmss12
@@ -17,31 +14,37 @@ Graphics_Context g_sContext;
 
 // Global variables
 static uint16_t joystickBuffer[2];
+Graphics_Context g_sContext;
 
 uint8_t current_page_number = 0;
 int16_t current_speed_limit = 69;
 int16_t current_speed = 12;
 
-float lon = 46.06705235237631;
-float lat = 11.149869220425288;
+float current_lon = 46.06705235237631;
+float current_lat = 11.149869220425288;
 
-int8_t* speed_from_int(int16_t speed) {
-    int8_t* str = (int8_t*)malloc(3 * sizeof(int8_t));
-    sprintf((char*)str, "%hd", speed);
-    return str;
-}
+int8_t* current_location_name = "Povo, Trento";
+
+// function signatures
+void draw_title(int8_t*);
+
 
 void draw_speed_limit() {
-    int8_t* speed_limit = speed_from_int(current_speed_limit);
-    Graphics_drawImage(&g_sContext, &slb_image, 0, 0);
+    int8_t speed_limit[3];
+    sprintf((char*)speed_limit, "%hd", current_speed_limit);
 
+    Graphics_clearDisplay(&g_sContext);
+
+    Graphics_drawImage(&g_sContext, &slb_image, 0, 0);
     Graphics_setFont(&g_sContext, &SPEED_FONT);
     Graphics_drawStringCentered(&g_sContext, speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
     Graphics_setFont(&g_sContext, &DEFAULT_FONT);
+    draw_title("Speed Limit");
 }
 
 void draw_speed() {
-    int8_t* speed = speed_from_int(current_speed);
+    int8_t speed[3];
+    sprintf((char*)speed, "%hd", current_speed);
     int COLOR;
 
     // Checking if over speed limit
@@ -53,12 +56,15 @@ void draw_speed() {
         COLOR = GRAPHICS_COLOR_GREEN;
     }
 
+    Graphics_clearDisplay(&g_sContext);
+    draw_title("Speed");
+
     Graphics_setFont(&g_sContext, &SPEED_FONT);
     Graphics_drawStringCentered(&g_sContext, speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
 
     Graphics_setForegroundColor(&g_sContext, COLOR);
     Graphics_setBackgroundColor(&g_sContext, COLOR);
-    Graphics_drawStringCentered(&g_sContext, "        ", AUTO_STRING_LENGTH, 64, 112, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, "          ", AUTO_STRING_LENGTH, 64, 112, OPAQUE_TEXT);
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_BLACK);
     Graphics_setBackgroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
 
@@ -69,14 +75,25 @@ void draw_speed() {
 void draw_geolocation() {
     int8_t latitude[10];
     int8_t longitude[10];
-    sprintf((char*)latitude, "%f", lat);
-    sprintf((char*)longitude, "%f", lon);
+    sprintf((char*)latitude, "%f", current_lat);
+    sprintf((char*)longitude, "%f", current_lon);
 
-    Graphics_drawStringCentered(&g_sContext, "Lon: ", AUTO_STRING_LENGTH, 20, 35, OPAQUE_TEXT);
-    Graphics_drawStringCentered(&g_sContext, longitude, AUTO_STRING_LENGTH, 60, 35, OPAQUE_TEXT);
+    Graphics_clearDisplay(&g_sContext);
+    draw_title("Geolocation");
 
-    Graphics_drawStringCentered(&g_sContext, "Lat: ", AUTO_STRING_LENGTH, 20, 55, OPAQUE_TEXT);
-    Graphics_drawStringCentered(&g_sContext, latitude, AUTO_STRING_LENGTH, 60, 55, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, "Lon: ", AUTO_STRING_LENGTH, 10, 35, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, longitude, AUTO_STRING_LENGTH, 40, 35, OPAQUE_TEXT);
+
+    Graphics_drawString(&g_sContext, "Lat: ", AUTO_STRING_LENGTH, 10, 55, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, latitude, AUTO_STRING_LENGTH, 40, 55, OPAQUE_TEXT);
+
+    Graphics_drawString(&g_sContext, "Location name:", AUTO_STRING_LENGTH, 10, 85, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, current_location_name, AUTO_STRING_LENGTH, 20, 105, OPAQUE_TEXT);
+}
+
+void draw_tilt() {
+    Graphics_clearDisplay(&g_sContext);
+    draw_title("Vehicle Tilt");
 }
 
 void draw_title(int8_t* title) {
@@ -89,41 +106,26 @@ void draw_title(int8_t* title) {
 void draw_page() {
     switch (current_page_number) {
     case 0:
-        Graphics_clearDisplay(&g_sContext);
         draw_speed_limit();
-        //Graphics_drawString(&g_sContext, "Speed Limit", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
-        draw_title("Speed Limit");
-
         break;
     case 1:
-        Graphics_clearDisplay(&g_sContext);
-        draw_title("Vehicle Tilt");
-
+        draw_speed();
         break;
     case 2:
-        Graphics_clearDisplay(&g_sContext);
-        draw_title("Speed");
-        draw_speed();
-
+        draw_tilt();
         break;
     case 3:
-        Graphics_clearDisplay(&g_sContext);
-        draw_title("Geolocation");
         draw_geolocation();
-
         break;
     default:
-        Graphics_clearDisplay(&g_sContext);
-        draw_title("Err");
-
+        draw_speed_limit();
         break;
     }
-
 }
 
 // function called when buttons S1 or S2 are pressed
 void change_page(int8_t delta) {
-    current_page_number = abs(current_page_number + delta) % PAGES;
+    current_page_number = (current_page_number + delta + PAGES) % PAGES;
     draw_page();
 }
 
@@ -136,6 +138,14 @@ void update_speed_limit(int16_t speed_limit) {
 // Function to call on vechicle speed change
 void update_speed(int16_t speed) {
     current_speed = speed;
+    draw_page();
+}
+
+// Function to call on geolocation change
+void update_geolocation(float lon, float lat, int8_t* location_name) {
+    current_lon = lon;
+    current_lat = lat;
+    current_location_name = location_name;
     draw_page();
 }
 
@@ -156,10 +166,9 @@ void ADC14_IRQHandler(void){
 
         // change page by checking x axis joystick value
         if(!isInIdleState(joystickBuffer[0])){
-            if(joystickBuffer[0] > 14000){
+            if(joystickBuffer[0] > 15000){
                 change_page(1);
-            }
-            if(joystickBuffer[0] < 2500){
+            } else if(joystickBuffer[0] < 1000){
                 change_page(-1);
             }
         }
