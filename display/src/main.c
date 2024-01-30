@@ -6,12 +6,8 @@
 // init functions
 #include "../include/init.h"
 
-// file with pages functions
+// UI functions
 #include "../include/pages.h"
-
-// Useful defines
-#define SCREEN_MAXWIDTH 128
-
 
 int main(void)
 {

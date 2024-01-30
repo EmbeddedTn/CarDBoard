@@ -11,6 +11,7 @@
 Graphics_Context g_sContext;
 
 #define SPEED_FONT g_sFontCmss30b
+#define TITLE_FONT g_sFontCmss12b
 #define DEFAULT_FONT g_sFontCmss12
 #define PAGES 4
 
@@ -20,6 +21,9 @@ static uint16_t joystickBuffer[2];
 uint8_t current_page_number = 0;
 int16_t current_speed_limit = 69;
 int16_t current_speed = 12;
+
+float lon = 46.06705235237631;
+float lat = 11.149869220425288;
 
 int8_t* speed_from_int(int16_t speed) {
     int8_t* str = (int8_t*)malloc(3 * sizeof(int8_t));
@@ -62,34 +66,55 @@ void draw_speed() {
     Graphics_drawStringCentered(&g_sContext, "Km/h", AUTO_STRING_LENGTH, 80, 64, OPAQUE_TEXT);
 }
 
-// Select the page to draw to the screen
+void draw_geolocation() {
+    int8_t latitude[10];
+    int8_t longitude[10];
+    sprintf((char*)latitude, "%f", lat);
+    sprintf((char*)longitude, "%f", lon);
+
+    Graphics_drawStringCentered(&g_sContext, "Lon: ", AUTO_STRING_LENGTH, 20, 35, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, longitude, AUTO_STRING_LENGTH, 60, 35, OPAQUE_TEXT);
+
+    Graphics_drawStringCentered(&g_sContext, "Lat: ", AUTO_STRING_LENGTH, 20, 55, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, latitude, AUTO_STRING_LENGTH, 60, 55, OPAQUE_TEXT);
+}
+
+void draw_title(int8_t* title) {
+    Graphics_setFont(&g_sContext, &TITLE_FONT);
+    Graphics_drawString(&g_sContext, title, AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+    Graphics_setFont(&g_sContext, &DEFAULT_FONT);
+}
+
+// page to draw on the screen
 void draw_page() {
     switch (current_page_number) {
     case 0:
         Graphics_clearDisplay(&g_sContext);
         draw_speed_limit();
-        Graphics_drawString(&g_sContext, "Speed Limit", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+        //Graphics_drawString(&g_sContext, "Speed Limit", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+        draw_title("Speed Limit");
 
         break;
     case 1:
         Graphics_clearDisplay(&g_sContext);
-        Graphics_drawString(&g_sContext, "Vehicle Tilt", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+        draw_title("Vehicle Tilt");
 
         break;
     case 2:
         Graphics_clearDisplay(&g_sContext);
-        Graphics_drawString(&g_sContext, "Speed", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+        draw_title("Speed");
         draw_speed();
 
         break;
     case 3:
         Graphics_clearDisplay(&g_sContext);
-        Graphics_drawString(&g_sContext, "Geolocation", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+        draw_title("Geolocation");
+        draw_geolocation();
 
         break;
     default:
         Graphics_clearDisplay(&g_sContext);
-        Graphics_drawString(&g_sContext, "Err", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+        draw_title("Err");
 
         break;
     }
@@ -118,7 +143,7 @@ bool isInIdleState(int x){
     return ((x>7000) && (x<9000));
 }
 
-// Joystick interrupt
+// Joystick interrupt handler
 void ADC14_IRQHandler(void){
     uint64_t status;
     status = ADC14_getEnabledInterruptStatus();
@@ -141,7 +166,7 @@ void ADC14_IRQHandler(void){
     }
 }
 
-// Button S1 interrupt
+// Button S1 interrupt handler
 void PORT5_IRQHandler(){
     uint_fast16_t status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P5);
     GPIO_clearInterruptFlag(GPIO_PORT_P5,status);
@@ -150,6 +175,7 @@ void PORT5_IRQHandler(){
     }
 }
 
+// Button S2 interrupt handler
 void PORT3_IRQHandler(){
     uint_fast16_t status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P3);
     GPIO_clearInterruptFlag(GPIO_PORT_P3,status);
