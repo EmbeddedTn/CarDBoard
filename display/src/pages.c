@@ -4,54 +4,52 @@
 #include <stdio.h>
 #include <stdint.h>
 
-// file containing the speed limit background image
+// file initializing the speed limit background image
 #include "../include/slb.h"
 
 /* Graphic library context */
 Graphics_Context g_sContext;
 
+#define SPEED_FONT g_sFontCmss30b
+#define DEFAULT_FONT g_sFontCmss12
 #define PAGES 4
 
 // Global variables
 static uint16_t joystickBuffer[2];
 
 uint8_t current_page_number = 0;
-int16_t current_speed = 130;
+int16_t current_speed_limit = 69;
+int16_t current_speed = 4.20;
 
 int8_t* speed_from_int(int16_t speed) {
-    switch (speed) {
-    case 30:
-        return "30";
-    case 40:
-        return "40";
-    case 50:
-        return "50";
-    case 60:
-        return "60";
-    case 70:
-        return "70";
-    case 90:
-        return "90";
-    case 110:
-        return "110";
-    case 130:
-        return "130";
-    default:
-        return "NaN";
-    }
+    int8_t* str = (int8_t*)malloc(3 * sizeof(int8_t));
+    sprintf((char*)str, "%hd", speed);
+    return str;
 }
 
-void draw_speed_limit(int16_t speed_int) {
-    int8_t* speed = speed_from_int(speed_int);
+void draw_speed_limit() {
+    int8_t* speed_limit = speed_from_int(current_speed_limit);
     Graphics_drawImage(&g_sContext, &slb_image, 0, 0);
-    Graphics_drawStringCentered(&g_sContext, speed, 3, 64, 64, OPAQUE_TEXT);
+
+    Graphics_setFont(&g_sContext, &SPEED_FONT);
+    Graphics_drawStringCentered(&g_sContext, speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
+    Graphics_setFont(&g_sContext, &DEFAULT_FONT);
+}
+
+void draw_speed() {
+    int8_t* speed = speed_from_int(current_speed);
+
+    Graphics_setFont(&g_sContext, &SPEED_FONT);
+    Graphics_drawStringCentered(&g_sContext, speed, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
+    Graphics_setFont(&g_sContext, &DEFAULT_FONT);
 }
 
 // Select the page to draw to the screen
 void draw_page() {
     switch (current_page_number) {
     case 0:
-        draw_speed_limit(current_speed);
+        Graphics_clearDisplay(&g_sContext);
+        draw_speed_limit();
         Graphics_drawString(&g_sContext, "Speed Limit", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
 
         break;
@@ -63,6 +61,7 @@ void draw_page() {
     case 2:
         Graphics_clearDisplay(&g_sContext);
         Graphics_drawString(&g_sContext, "Speed", AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
+        draw_speed();
 
         break;
     case 3:
@@ -87,7 +86,13 @@ void change_page(int8_t delta) {
 
 // Function to call on speed_limit change
 void update_speed_limit(int16_t speed_limit) {
-    current_speed = speed_limit;
+    current_speed_limit = speed_limit;
+    draw_page();
+}
+
+// Function to call on vechicle speed change
+void update_speed(int16_t speed) {
+    current_speed = speed;
     draw_page();
 }
 

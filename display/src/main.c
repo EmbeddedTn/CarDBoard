@@ -6,9 +6,6 @@
 // init functions
 #include "../include/init.h"
 
-// file including the font WIP
-#include "../include/font.h"
-
 // file with pages functions
 #include "../include/pages.h"
 
@@ -20,9 +17,6 @@ int main(void)
 {
     _hwInit();
     _graphicsInit();
-
-    // WIP
-    // initFont();
 
     draw_page(0);
     while (1){
