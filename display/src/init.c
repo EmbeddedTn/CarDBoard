@@ -142,6 +142,11 @@ void _hwInit(){
     CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
     CS_initClockSignal(CS_ACLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
 
+
+}
+
+void init_all() {
+    _hwInit();
     _graphicsInit();
     _displayButtonsInit();
     _adcInit();

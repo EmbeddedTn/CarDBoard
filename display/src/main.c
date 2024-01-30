@@ -15,8 +15,7 @@
 
 int main(void)
 {
-    _hwInit();
-    _graphicsInit();
+    init_all();
 
     draw_page(0);
     while (1){
