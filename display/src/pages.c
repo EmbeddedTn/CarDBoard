@@ -71,7 +71,7 @@ void draw_speed() {
     Graphics_setBackgroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
 
     Graphics_setFont(&g_sContext, &DEFAULT_FONT);
-    Graphics_drawStringCentered(&g_sContext, "Km/h", AUTO_STRING_LENGTH, 80, 64, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, "Km/h", AUTO_STRING_LENGTH, 80, 64, OPAQUE_TEXT);
 }
 
 void draw_geolocation() {
@@ -134,13 +134,47 @@ void change_page(int8_t delta) {
 // Function to call on speed_limit change
 void update_speed_limit(int16_t speed_limit) {
     current_speed_limit = speed_limit;
-    draw_page();
+    if (current_page_number == 0) {
+        int8_t speed_limit[3];
+        sprintf((char*)speed_limit, "%hd", current_speed_limit);
+
+        Graphics_setFont(&g_sContext, &SPEED_FONT);
+        Graphics_drawStringCentered(&g_sContext, "    ", AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
+        Graphics_drawStringCentered(&g_sContext, speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
+        Graphics_setFont(&g_sContext, &DEFAULT_FONT);
+    }
 }
 
 // Function to call on vechicle speed change
-void update_speed(int16_t speed) {
-    current_speed = speed;
-    draw_page();
+void update_speed(int16_t nSpeed) {
+    current_speed = nSpeed;
+
+    if (current_page_number == 1) {
+        int8_t speed[3];
+        sprintf((char*)speed, "%hd", current_speed);
+        int COLOR;
+
+        // Checking if over speed limit
+        if (current_speed > current_speed_limit) {
+            COLOR = GRAPHICS_COLOR_RED;
+        } else if (abs(current_speed - current_speed_limit) < 5) {
+            COLOR = GRAPHICS_COLOR_ORANGE;
+        } else {
+            COLOR = GRAPHICS_COLOR_GREEN;
+        }
+
+        Graphics_setFont(&g_sContext, &SPEED_FONT);
+        Graphics_drawStringCentered(&g_sContext, "    ", AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
+        Graphics_drawStringCentered(&g_sContext, speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
+
+        Graphics_setForegroundColor(&g_sContext, COLOR);
+        Graphics_setBackgroundColor(&g_sContext, COLOR);
+        Graphics_drawStringCentered(&g_sContext, "          ", AUTO_STRING_LENGTH, 64, 112, OPAQUE_TEXT);
+        Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_BLACK);
+        Graphics_setBackgroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
+
+        Graphics_setFont(&g_sContext, &DEFAULT_FONT);
+    }
 }
 
 // Function to call on geolocation change
