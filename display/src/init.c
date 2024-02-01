@@ -15,7 +15,30 @@
 
 #include "../include/pages.h"
 #include "../include/init.h"
-#include "../include/song.h"
+// #include "../include/song.h"
+
+/* Application Defines  */
+#define TIMER_PERIOD 0x2DC6 // 11718
+
+/* Timer_A UpMode Configuration Parameter */
+const Timer_A_UpModeConfig upConfig =
+{
+        TIMER_A_CLOCKSOURCE_ACLK,               // 32768 Hz
+        TIMER_A_CLOCKSOURCE_DIVIDER_8,          // 32768 / 8 = 4096 Hz
+        TIMER_PERIOD,                           // 11718 / 4096 ~= 2.86s the interrupt is registered
+        TIMER_A_TAIE_INTERRUPT_DISABLE,         // Disable Timer interrupt
+        TIMER_A_CCIE_CCR0_INTERRUPT_ENABLE ,    // Enable CCR0 interrupt
+        TIMER_A_DO_CLEAR                        // Clear value
+};
+
+void _timerA1Init() {
+    Timer_A_configureUpMode(TIMER_A1_BASE, &upConfig);
+
+    /* Enabling interrupts and starting the timer */
+    Interrupt_enableSleepOnIsrExit();
+    Interrupt_enableInterrupt(INT_TA1_0);
+    Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);
+}
 
 void _graphicsInit(){
     /* Initializes display */
@@ -117,7 +140,8 @@ void init_all() {
     _hwInit();
     _graphicsInit();
     _displayButtonsInit();
-    _toneInit();
+    // _toneInit();
     _adcInit();
+    _timerA1Init();
 }
 

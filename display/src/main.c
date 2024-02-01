@@ -14,16 +14,16 @@ int main(void)
     init_all();
 
     draw_page(0);
-    int i = 0;
     srand(time(0));
     while (1){
-       //PCM_gotoLPM0();
-       i++;
-       if(i == 1000000) {
-           i = 0;
-           update_speed_limit(rand() % 150);
-       } else if (i % 500000 == 0) {
-           update_speed(rand() % 150);
-       }
+       PCM_gotoLPM0();
     }
+}
+
+void TA1_0_IRQHandler(void)
+{
+    update_speed_limit(rand() % 150);
+    update_speed(rand() % 150);
+    Timer_A_clearCaptureCompareInterrupt(TIMER_A1_BASE,
+            TIMER_A_CAPTURECOMPARE_REGISTER_0);
 }

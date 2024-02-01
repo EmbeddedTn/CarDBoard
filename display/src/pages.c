@@ -7,7 +7,7 @@
 // file initializing the speed limit background image
 #include "../include/slb.h"
 
-#include "../include/song.h"
+// #include "../include/song.h"
 
 #define SPEED_FONT g_sFontCmss30b
 #define TITLE_FONT g_sFontCmss12b
@@ -218,25 +218,14 @@ void PORT5_IRQHandler(){
 //    if (status & GPIO_PIN1){
 //        reproduce_song();
 //    }
-
-//    uint_fast16_t status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P5);
-//    GPIO_clearInterruptFlag(GPIO_PORT_P5,status);
-//    if (status & GPIO_PIN1){
-//        change_page(1);
-//    }
 }
 
 // Button S2 interrupt handler
 void PORT3_IRQHandler(){
-    uint_fast16_t status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P3);
-    GPIO_clearInterruptFlag(GPIO_PORT_P3,status);
-    if (status & GPIO_PIN5){
-        play_pause();
-    }
 //    uint_fast16_t status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P3);
 //    GPIO_clearInterruptFlag(GPIO_PORT_P3,status);
 //    if (status & GPIO_PIN5){
-//        change_page(-1);
+//        play_pause();
 //    }
 }
 
