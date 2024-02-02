@@ -5,6 +5,10 @@ Final project for Embedded Systems for the Internet of Things  [UniTn - 145996]
 Car Dashboard with speed indicator, street sign and speed limit display.
 Future idea -> parking sensors
 
+## TODO:
+  - add informative function comments to the header files
+  - contol that the code is using the smallest data types to optimize memory 
+
 ### Libraries 
 - LVGL
 - TinyGPS++
