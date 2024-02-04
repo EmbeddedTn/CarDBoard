@@ -6,8 +6,10 @@ Car Dashboard with speed indicator, street sign and speed limit display.
 Future idea -> parking sensors
 
 ## TODO:
+  - prototype all functions (in header files) to avoid _promotion to ints_ for smaller types
   - add informative function comments to the header files
   - contol that the code is using the smallest data types to optimize memory 
+  - correctly use _volatile_ keyword for certain global variables
 
 ### Libraries 
 - LVGL
