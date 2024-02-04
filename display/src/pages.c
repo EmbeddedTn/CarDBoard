@@ -7,7 +7,6 @@
 // file initializing the speed limit background image
 #include "../include/slb.h"
 
-// #include "../include/song.h"
 
 #define SPEED_FONT g_sFontCmss30b
 #define TITLE_FONT g_sFontCmss12b
@@ -18,7 +17,7 @@
 static uint16_t joystickBuffer[2];
 Graphics_Context g_sContext;
 
-uint8_t current_page_number = 0;
+volatile uint8_t current_page_number = 0;
 int16_t current_speed_limit = 69;
 int16_t current_speed = 12;
 
@@ -26,9 +25,6 @@ float current_lon = 46.06705235237631;
 float current_lat = 11.149869220425288;
 
 int8_t* current_location_name = "Povo, Trento";
-
-// function signatures
-void draw_title(int8_t*);
 
 
 void draw_speed_limit() {
@@ -185,12 +181,12 @@ void update_geolocation(float lon, float lat, int8_t* location_name) {
     draw_page();
 }
 
-bool isInIdleState(int x){
+bool in_idle_state(int x) {
     return ((x>7000) && (x<9000));
 }
 
 // Joystick interrupt handler
-void ADC14_IRQHandler(void){
+void ADC14_IRQHandler(void) {
     uint64_t status;
     status = ADC14_getEnabledInterruptStatus();
     ADC14_clearInterruptFlag(status);
@@ -201,7 +197,7 @@ void ADC14_IRQHandler(void){
         joystickBuffer[1] = ADC14_getResult(ADC_MEM1);
 
         // change page by checking x axis joystick value
-        if(!isInIdleState(joystickBuffer[0])){
+        if(!in_idle_state(joystickBuffer[0])){
             if(joystickBuffer[0] > 15000){
                 change_page(1);
             } else if(joystickBuffer[0] < 1000){

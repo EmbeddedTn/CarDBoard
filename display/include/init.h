@@ -13,5 +13,6 @@ void _displayButtonsInit();
 void _hwInit();
 void _adcInit();
 void initFont();
+void init_all();
 
 #endif /* INCLUDE_INIT_H_ */

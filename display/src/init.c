@@ -1,10 +1,3 @@
-/*
- * init.c
- *
- *  Created on: Jan 25, 2024
- *      Author: degra
- */
-
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
@@ -15,9 +8,7 @@
 
 #include "../include/pages.h"
 #include "../include/init.h"
-// #include "../include/song.h"
 
-/* Application Defines  */
 #define TIMER_PERIOD 0x2DC6 // 11718
 
 /* Timer_A UpMode Configuration Parameter */
@@ -140,7 +131,6 @@ void init_all() {
     _hwInit();
     _graphicsInit();
     _displayButtonsInit();
-    // _toneInit();
     _adcInit();
     _timerA1Init();
 }

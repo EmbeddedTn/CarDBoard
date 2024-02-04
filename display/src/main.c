@@ -2,6 +2,8 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
+#include <stdlib.h>
 
 // init functions
 #include "../include/init.h"
@@ -13,13 +15,21 @@ int main(void)
 {
     init_all();
 
-    draw_page(0);
     srand(time(0));
+    draw_page(0);
+
     while (1){
        PCM_gotoLPM0();
     }
 }
 
+
+// Example timer handler implementation to change the values of speed_limit and speed
+// See init.h for timer specs
+//
+// -- Usage
+// A timer can be implemented to query ESP and check if the parameters have changed.
+// If so, call update_{parameter}() function to update the screen.
 void TA1_0_IRQHandler(void)
 {
     update_speed_limit(rand() % 150);
