@@ -7,6 +7,7 @@
 // file initializing the speed limit background image
 #include "../include/slb.h"
 
+static uint16_t resultsBuffer[3];
 
 #define SPEED_FONT g_sFontCmss30b
 #define TITLE_FONT g_sFontCmss12b
@@ -92,6 +93,16 @@ void draw_geolocation() {
 void draw_tilt() {
     Graphics_clearDisplay(&g_sContext);
     draw_title("Vehicle Tilt");
+    int8_t x_accelerometer[8];
+    int8_t y_accelerometer[8];
+    int8_t z_accelerometer[8];
+    snprintf((char*)x_accelerometer, sizeof(x_accelerometer), "%d", resultsBuffer[0]);
+    snprintf((char*)y_accelerometer, sizeof(y_accelerometer), "%d", resultsBuffer[1]);
+    snprintf((char*)z_accelerometer, sizeof(z_accelerometer), "%d", resultsBuffer[2]);
+    Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 35, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 10, 55, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, z_accelerometer, AUTO_STRING_LENGTH, 10, 75, OPAQUE_TEXT);
+
 }
 
 void draw_title(int8_t* title) {
@@ -147,7 +158,7 @@ void update_speed(int16_t nSpeed) {
 
     if (current_page_number == 1) {
         int8_t speed[3];
-        sprintf((char*)speed, "%hd", current_speed);
+        sprintf((char*)speed, "%d", current_speed);
         int COLOR;
 
         // Checking if over speed limit
@@ -181,11 +192,25 @@ void update_geolocation(float lon, float lat, int8_t* location_name) {
     draw_page();
 }
 
+void update_tilt(){
+    if (current_page_number == 2){
+        int8_t x_accelerometer[8];
+        int8_t y_accelerometer[8];
+        int8_t z_accelerometer[8];
+        snprintf((char*)x_accelerometer, sizeof(x_accelerometer), "%d", resultsBuffer[0]);
+        snprintf((char*)y_accelerometer, sizeof(y_accelerometer), "%d", resultsBuffer[1]);
+        snprintf((char*)z_accelerometer, sizeof(z_accelerometer), "%d", resultsBuffer[2]);
+        Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 35, OPAQUE_TEXT);
+        Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 10, 55, OPAQUE_TEXT);
+        Graphics_drawString(&g_sContext, z_accelerometer, AUTO_STRING_LENGTH, 10, 75, OPAQUE_TEXT);
+    }
+}
+
 bool in_idle_state(int x) {
     return ((x>7000) && (x<9000));
 }
 
-// Joystick interrupt handler
+// Joystick and accelerometer interrupt handler
 void ADC14_IRQHandler(void) {
     uint64_t status;
     status = ADC14_getEnabledInterruptStatus();
@@ -204,6 +229,21 @@ void ADC14_IRQHandler(void) {
                 change_page(-1);
             }
         }
+    }
+
+    //Accelerometer
+    /* This interrupt is fired whenever a conversion is completed and placed in
+     * ADC_MEM2. This signals the end of conversion and the results array is
+     * grabbed and placed in resultsBuffer */
+
+    /* Accelerometer reading finished (ADC_MEM2-3-4 conversion completed) */
+    if (status & ADC_INT2)
+    {
+        /* Store ADC14 conversion results */
+        resultsBuffer[0] = ADC14_getResult(ADC_MEM2);
+        resultsBuffer[1] = ADC14_getResult(ADC_MEM3);
+        resultsBuffer[2] = ADC14_getResult(ADC_MEM4);
+        //printf("X-%d, Y-%d, Z-%d\n", resultsBuffer[0],resultsBuffer[1],resultsBuffer[2]);
     }
 }
 

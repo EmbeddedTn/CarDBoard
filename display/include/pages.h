@@ -18,6 +18,7 @@ bool in_idle_state(int x);
 void update_speed_limit(int speed_limit);
 void update_speed(int speed);
 void update_geolocation(float lon, float lat, int8_t* location_name);
+void update_tilt();
 
 
 #endif /* PAGES_H_ */

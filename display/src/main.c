@@ -37,3 +37,11 @@ void TA1_0_IRQHandler(void)
     Timer_A_clearCaptureCompareInterrupt(TIMER_A1_BASE,
             TIMER_A_CAPTURECOMPARE_REGISTER_0);
 }
+
+void TA2_0_IRQHandler(void)
+{
+    update_tilt();
+    Timer_A_clearCaptureCompareInterrupt(TIMER_A2_BASE,
+            TIMER_A_CAPTURECOMPARE_REGISTER_0);
+
+}

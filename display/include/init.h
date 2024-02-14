@@ -14,5 +14,7 @@ void _hwInit();
 void _adcInit();
 void initFont();
 void init_all();
+void _timerA1Init();
+void _fastTimerA2Init();
 
 #endif /* INCLUDE_INIT_H_ */
