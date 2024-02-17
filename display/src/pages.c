@@ -1,3 +1,4 @@
+#include <include/images.h>
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
@@ -5,7 +6,9 @@
 #include <stdint.h>
 
 // file initializing the speed limit background image
-#include "../include/slb.h"
+#include "../include/images.h"
+
+// file initializing the car icons
 
 static uint16_t resultsBuffer[3];
 
@@ -93,6 +96,8 @@ void draw_geolocation() {
 void draw_tilt() {
     Graphics_clearDisplay(&g_sContext);
     draw_title("Vehicle Tilt");
+    Graphics_drawImage(&g_sContext, &car_side, 80, 35);
+    Graphics_drawImage(&g_sContext, &car_front, 80, 70);
     int8_t x_accelerometer[8];
     int8_t y_accelerometer[8];
     int8_t z_accelerometer[8];
@@ -107,6 +112,7 @@ void draw_tilt() {
 
 void draw_title(int8_t* title) {
     Graphics_setFont(&g_sContext, &TITLE_FONT);
+    //Graphics_drawImage(&g_sContext, &front_car_image, 80, 35);
     Graphics_drawString(&g_sContext, title, AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
     Graphics_setFont(&g_sContext, &DEFAULT_FONT);
 }
@@ -142,6 +148,7 @@ void change_page(int8_t delta) {
 void update_speed_limit(int16_t speed_limit) {
     current_speed_limit = speed_limit;
     if (current_page_number == 0) {
+
         int8_t speed_limit[3];
         sprintf((char*)speed_limit, "%hd", current_speed_limit);
 

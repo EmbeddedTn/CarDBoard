@@ -16,7 +16,7 @@ int main(void)
     init_all();
 
     srand(time(0));
-    draw_page(0);
+    draw_page(-1);
 
     while (1){
        PCM_gotoLPM0();
