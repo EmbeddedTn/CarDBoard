@@ -88,6 +88,7 @@ SECTIONS
     .pinit  :   > MAIN
     .init_array   :     > MAIN
     .binit        : {}  > MAIN
+    .ram_functions : {} > MAIN
 
     /* The following sections show the usage of the INFO flash memory        */
     /* INFO flash memory is intended to be used for the following            */
