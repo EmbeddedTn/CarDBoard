@@ -16,8 +16,6 @@ int main(void)
     init_all();
 
     srand(time(0));
-    draw_page(0);
-
     while (1){
        PCM_gotoLPM0();
     }
@@ -30,6 +28,7 @@ int main(void)
 // -- Usage
 // A timer can be implemented to query ESP and check if the parameters have changed.
 // If so, call update_{parameter}() function to update the screen.
+volatile int8_t first = 0;
 void TA1_0_IRQHandler(void)
 {
     update_speed_limit(rand() % 150);

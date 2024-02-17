@@ -27,10 +27,22 @@ float current_lat = 11.149869220425288;
 
 int8_t* current_location_name = "Povo, Trento";
 
+// Moving snprintf to RAM to improve performance
+#pragma CODE_SECTION(snprintf, ".ram_functions")
+int snprintf(char* str, size_t size, const char* format, ...)
+{
+    int r;
+    va_list args;
+    va_start(args, format);
+    r = vsnprintf(str, size, format, args);
+    va_end(args);
+    return r;
+}
+
 
 void draw_speed_limit() {
     int8_t speed_limit[3];
-    sprintf((char*)speed_limit, "%hd", current_speed_limit);
+    snprintf((char*)speed_limit, sizeof(speed_limit), "%hd", current_speed_limit);
 
     Graphics_clearDisplay(&g_sContext);
 
@@ -43,7 +55,7 @@ void draw_speed_limit() {
 
 void draw_speed() {
     int8_t speed[3];
-    sprintf((char*)speed, "%hd", current_speed);
+    snprintf((char*)speed, sizeof(speed), "%hd", current_speed);
     int COLOR;
 
     // Checking if over speed limit
@@ -74,8 +86,8 @@ void draw_speed() {
 void draw_geolocation() {
     int8_t latitude[10];
     int8_t longitude[10];
-    sprintf((char*)latitude, "%f", current_lat);
-    sprintf((char*)longitude, "%f", current_lon);
+    snprintf((char*)latitude, sizeof(latitude), "%f", current_lat);
+    snprintf((char*)longitude, sizeof(longitude) , "%f", current_lon);
 
     Graphics_clearDisplay(&g_sContext);
     draw_title("Geolocation");
@@ -102,7 +114,6 @@ void draw_tilt() {
     Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 35, OPAQUE_TEXT);
     Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 10, 55, OPAQUE_TEXT);
     Graphics_drawString(&g_sContext, z_accelerometer, AUTO_STRING_LENGTH, 10, 75, OPAQUE_TEXT);
-
 }
 
 void draw_title(int8_t* title) {
@@ -128,6 +139,7 @@ void draw_page() {
         break;
     default:
         draw_speed_limit();
+        current_page_number = 0;
         break;
     }
 }
@@ -143,7 +155,7 @@ void update_speed_limit(int16_t speed_limit) {
     current_speed_limit = speed_limit;
     if (current_page_number == 0) {
         int8_t speed_limit[3];
-        sprintf((char*)speed_limit, "%hd", current_speed_limit);
+        snprintf((char*)speed_limit, sizeof(speed_limit), "%hd", current_speed_limit);
 
         Graphics_setFont(&g_sContext, &SPEED_FONT);
         Graphics_drawStringCentered(&g_sContext, "    ", AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
@@ -158,7 +170,7 @@ void update_speed(int16_t nSpeed) {
 
     if (current_page_number == 1) {
         int8_t speed[3];
-        sprintf((char*)speed, "%d", current_speed);
+        snprintf((char*)speed, sizeof(speed), "%d", current_speed);
         int COLOR;
 
         // Checking if over speed limit
