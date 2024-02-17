@@ -14,6 +14,7 @@
 int main(void)
 {
     init_all();
+    car_side_init();
 
     srand(time(0));
     while (1){

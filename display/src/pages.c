@@ -5,12 +5,15 @@
 #include <stdio.h>
 #include <stdint.h>
 
-// file initializing the speed limit background image
+// file initializing the images
 #include "../include/images.h"
+#include "../include/car_front.h"
+#include "../include/car_side.h"
 
-// file initializing the car icons
+// accelerometer functions
+#include "../include/accelerometer.h"
 
-static uint16_t resultsBuffer[3];
+
 
 #define SPEED_FONT g_sFontCmss30b
 #define TITLE_FONT g_sFontCmss12b
@@ -21,9 +24,35 @@ static uint16_t resultsBuffer[3];
 static uint16_t joystickBuffer[2];
 Graphics_Context g_sContext;
 
+Graphics_Image car_side_array[19];
+
+void car_side_init(){
+        car_side_array[0] = car_side_output__45;
+        car_side_array[1] = car_side_output__40;
+        car_side_array[2] = car_side_output__35;
+        car_side_array[3] = car_side_output__30;
+        car_side_array[4] = car_side_output__25;
+        car_side_array[5] = car_side_output__20;
+        car_side_array[6] = car_side_output__15;
+        car_side_array[7] = car_side_output__10;
+        car_side_array[8] = car_side_output__5;
+        car_side_array[9] = car_side;
+        car_side_array[10] = car_side_output_5;
+        car_side_array[11] = car_side_output_10;
+        car_side_array[12] = car_side_output_15;
+        car_side_array[13] = car_side_output_20;
+        car_side_array[14] = car_side_output_25;
+        car_side_array[15] = car_side_output_30;
+        car_side_array[16] = car_side_output_35;
+        car_side_array[17] = car_side_output_40;
+        car_side_array[18] = car_side_output_45;
+}
+
 volatile uint8_t current_page_number = 0;
 int16_t current_speed_limit = 69;
 int16_t current_speed = 12;
+
+static uint16_t resultsBuffer[2];
 
 float current_lon = 46.06705235237631;
 float current_lat = 11.149869220425288;
@@ -108,17 +137,15 @@ void draw_geolocation() {
 void draw_tilt() {
     Graphics_clearDisplay(&g_sContext);
     draw_title("Vehicle Tilt");
-    Graphics_drawImage(&g_sContext, &car_side, 80, 35);
-    Graphics_drawImage(&g_sContext, &car_front, 80, 70);
+    Graphics_drawImage(&g_sContext, &car_side, 10, 35);
+    Graphics_drawImage(&g_sContext, &car_front, 80, 35);
     int8_t x_accelerometer[8];
     int8_t y_accelerometer[8];
-    int8_t z_accelerometer[8];
-    snprintf((char*)x_accelerometer, sizeof(x_accelerometer), "%d", resultsBuffer[0]);
-    snprintf((char*)y_accelerometer, sizeof(y_accelerometer), "%d", resultsBuffer[1]);
-    snprintf((char*)z_accelerometer, sizeof(z_accelerometer), "%d", resultsBuffer[2]);
-    Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 35, OPAQUE_TEXT);
-    Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 10, 55, OPAQUE_TEXT);
-    Graphics_drawString(&g_sContext, z_accelerometer, AUTO_STRING_LENGTH, 10, 75, OPAQUE_TEXT);
+
+    sprintf((char*) x_accelerometer, " %1.2f ", changeG(resultsBuffer[0]));
+    sprintf((char*) y_accelerometer, " %1.2f ", changeG(resultsBuffer[1]));
+    Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 70, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 80, 70, OPAQUE_TEXT);
 }
 
 void draw_title(int8_t* title) {
@@ -211,19 +238,35 @@ void update_geolocation(float lon, float lat, int8_t* location_name) {
     draw_page();
 }
 
+void update_car_side(float y_axis){
+    int interval_index;
+    if(y_axis>=-0.15 && y_axis <= 0.15){
+        interval_index = 9;
+    }else{
+        interval_index = (y_axis + 0.85) / 0.094;
+    }
+    Graphics_drawImage(&g_sContext, &car_side_array[interval_index], 10, 35);
+}
+
 void update_tilt(){
     if (current_page_number == 2){
         int8_t x_accelerometer[8];
         int8_t y_accelerometer[8];
-        int8_t z_accelerometer[8];
-        snprintf((char*)x_accelerometer, sizeof(x_accelerometer), "%d", resultsBuffer[0]);
-        snprintf((char*)y_accelerometer, sizeof(y_accelerometer), "%d", resultsBuffer[1]);
-        snprintf((char*)z_accelerometer, sizeof(z_accelerometer), "%d", resultsBuffer[2]);
-        Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 35, OPAQUE_TEXT);
-        Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 10, 55, OPAQUE_TEXT);
-        Graphics_drawString(&g_sContext, z_accelerometer, AUTO_STRING_LENGTH, 10, 75, OPAQUE_TEXT);
+        float x_res = changeG(resultsBuffer[0]);
+        float y_res = changeG(resultsBuffer[1]);
+
+        sprintf((char*) x_accelerometer, " %1.2f ", x_res);
+        sprintf((char*) y_accelerometer, " %1.2f ", y_res);
+        Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 70, OPAQUE_TEXT);
+        Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 80, 70, OPAQUE_TEXT);
+
+        update_car_side(y_res);
+        Graphics_drawImage(&g_sContext, &car_front, 80, 35);
+
     }
 }
+
+
 
 bool in_idle_state(int x) {
     return ((x>7000) && (x<9000));
@@ -261,7 +304,6 @@ void ADC14_IRQHandler(void) {
         /* Store ADC14 conversion results */
         resultsBuffer[0] = ADC14_getResult(ADC_MEM2);
         resultsBuffer[1] = ADC14_getResult(ADC_MEM3);
-        resultsBuffer[2] = ADC14_getResult(ADC_MEM4);
         //printf("X-%d, Y-%d, Z-%d\n", resultsBuffer[0],resultsBuffer[1],resultsBuffer[2]);
     }
 }

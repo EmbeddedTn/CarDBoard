@@ -19,6 +19,8 @@ void update_speed_limit(int speed_limit);
 void update_speed(int speed);
 void update_geolocation(float lon, float lat, int8_t* location_name);
 void update_tilt();
+void update_car_side(float y_axis);
+void car_side_init();
 
 
 #endif /* PAGES_H_ */
