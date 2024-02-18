@@ -16,10 +16,13 @@ const char* exampleQuery = "https://nominatim.openstreetmap.org/reverse?format=j
 #define GPS_SERIAL Serial2  
 #define RATE 9600
 
+//0 Indirizzo, 1 Velocità, 2 Limite Velocità, 3 Lat, 4 Lon
+
 // Define TinyGPS++ object
 TinyGPSPlus gps;
 
-void setup() {
+void setup() 
+{
   // Start serial 
   Serial.begin(115200);
   GPS_SERIAL.begin(RATE);
@@ -34,7 +37,8 @@ void setup() {
   Serial.println("Connected to WiFi");
 }
 
-void loop() {
+void loop() 
+{
   // Update GPS data
   while (GPS_SERIAL.available() > 0 && WiFi.status() == WL_CONNECTED) 
   {
@@ -93,6 +97,7 @@ String sendReq(float lat, float lon)
   return payload;
 }
 
+
 JSONVar parseResponse(String payload)
 {
   // Create var
@@ -112,6 +117,47 @@ JSONVar parseResponse(String payload)
   return jsonRes;
 }
 
+String sendAddress(JSONVar jsonRes)
+{
+  String address = jsonRes["address"];
+  return "0" + address;
+}
+
+String sendSpeed(JSONVar jsonRes)
+{
+   // TODO
+  // return "1" + // 
+}
+
+String sendLimit(JSONVar jsonRes)
+{
+  int limit = 50;
+  String type = jsonRes["highway"];
+  switch (type){
+    case "motorway": limit = 130;
+    break;
+    case "primary": limit = 110;
+    break;
+    // case "motorway": limit = 130;
+    // break;
+    // case "motorway": limit = 130;
+    // break;
+    default: limit = 30;
+  }
+  return "2" +  (String) limit
+}
+
+String sendLat(float lat)
+{
+  return "3" + (String) lat;
+}
+
+String sendLat(float lon)
+{
+  return "4" + (String) lon;
+}
+
+
 void printKeys(JSONVar res)
 {
   JSONVar keys = res.keys();
@@ -124,3 +170,5 @@ void printKeys(JSONVar res)
     Serial.println(value);
   }
 }
+
+
