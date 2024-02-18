@@ -19,15 +19,9 @@ int main(void) {
 }
 
 void TA1_0_IRQHandler(void) {
-    int i = 0;
-    for(; i < N_INTERRUPTS_TA1_0; i++){
-        INTERRUPTS_TA1_0[i]();
-    }
+    irq_dispatcher(INTERRUPTS_TA1_0, N_INTERRUPTS_TA1_0);
 }
 
 void TA2_0_IRQHandler(void) {
-    int i = 0;
-    for(; i < N_INTERRUPTS_TA1_0; i++){
-        INTERRUPTS_TA1_0[i]();
-    }
+    irq_dispatcher(INTERRUPTS_TA2_0, N_INTERRUPTS_TA2_0);
 }
