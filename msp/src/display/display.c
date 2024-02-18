@@ -8,6 +8,7 @@
 #include "init.h"
 
 void setup__display(){
+    srand(time(0));
     init_all();
 
 //    draw_page(0);

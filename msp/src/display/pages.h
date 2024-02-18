@@ -17,8 +17,8 @@ void change_page(int8_t delta);
 bool in_idle_state(int x);
 
 void update_speed_limit(uint16_t speed_limit);
-extern void update_speed(uint16_t speed);
-void update_geolocation(float lon, float lat, int8_t* location_name);
+extern void update_speed(uint8_t nSpeed);
+void update_geolocation(uint8_t* lon, uint8_t* lat, uint8_t* location_name);
 void update_tilt();
 void update_car_side(float y_axis);
 void car_side_init();

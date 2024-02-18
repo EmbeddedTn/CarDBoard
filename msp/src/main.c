@@ -1,4 +1,3 @@
-#include <src/mods.h>
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
@@ -25,3 +24,16 @@ void TA1_0_IRQHandler(void) {
 void TA2_0_IRQHandler(void) {
     irq_dispatcher(INTERRUPTS_TA2_0, N_INTERRUPTS_TA2_0);
 }
+
+
+// Example timer handler implementation to change the values of speed_limit and speed
+// See init.h for timer specs
+//
+// -- Usage
+// A timer can be implemented to query ESP and check if the parameters have changed.
+// If so, call update_{parameter}() function to update the screen.
+
+
+
+
+
