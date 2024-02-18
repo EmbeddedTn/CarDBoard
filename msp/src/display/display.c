@@ -10,8 +10,10 @@
 void setup__display(){
     init_all();
 
-    srand(time(0));
-    draw_page(0);
+//    draw_page(0);
+
+    car_side_init();
+    car_front_init();
 }
 
 void interrupt_TA1_0__display(void){

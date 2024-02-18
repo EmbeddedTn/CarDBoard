@@ -13,7 +13,8 @@ const char* password = "REPLACE_PASSWORD";
 const char* exampleQuery = "https://nominatim.openstreetmap.org/reverse?format=jsonv2";
 
 
-#define GPS_SERIAL Serial2
+#define GPS_SERIAL Serial2  
+#define RATE 9600
 
 // Define TinyGPS++ object
 TinyGPSPlus gps;
@@ -21,7 +22,7 @@ TinyGPSPlus gps;
 void setup() {
   // Start serial 
   Serial.begin(115200);
-  GPS_SERIAL.begin(9600);
+  GPS_SERIAL.begin(RATE);
 
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);

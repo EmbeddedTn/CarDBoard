@@ -7,8 +7,6 @@
 #include "pages.h"
 #include "init.h"
 
-#define TIMER_PERIOD 0x2DC6 // 11718
-
 /* Timer_A UpMode Configuration Parameter */
 const Timer_A_UpModeConfig upConfig =
 {
@@ -20,14 +18,6 @@ const Timer_A_UpModeConfig upConfig =
         TIMER_A_DO_CLEAR                        // Clear value
 };
 
-void _timerA1Init() {
-    Timer_A_configureUpMode(TIMER_A1_BASE, &upConfig);
-
-    /* Enabling interrupts and starting the timer */
-    Interrupt_enableSleepOnIsrExit();
-    Interrupt_enableInterrupt(INT_TA1_0);
-    Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);
-}
 
 void _graphicsInit(){
     /* Initializes display */
@@ -67,43 +57,73 @@ void _displayButtonsInit() {
     Interrupt_enableMaster();
 }
 
+void _timerA1Init() {
+    Timer_A_configureUpMode(TIMER_A1_BASE, &upConfig);
+    Interrupt_enableInterrupt(INT_TA1_0);
+    Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);
+}
+
 void _adcInit(){
     /* Configures Pin 6.0 and 4.4 as ADC input */
-        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P6, GPIO_PIN0, GPIO_TERTIARY_MODULE_FUNCTION);
-        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P4, GPIO_PIN4, GPIO_TERTIARY_MODULE_FUNCTION);
+    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P6, GPIO_PIN0, GPIO_TERTIARY_MODULE_FUNCTION);
+    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P4, GPIO_PIN4, GPIO_TERTIARY_MODULE_FUNCTION);
 
-        /* Initializing ADC (ADCOSC/64/8) */
-        ADC14_enableModule();
-        ADC14_initModule(ADC_CLOCKSOURCE_ADCOSC, ADC_PREDIVIDER_64, ADC_DIVIDER_8, 0);
 
-        /* Configuring ADC Memory (ADC_MEM0 - ADC_MEM1 (A15, A9)  with repeat)
-             * with internal 2.5v reference */
-        ADC14_configureMultiSequenceMode(ADC_MEM0, ADC_MEM1, true);
-        ADC14_configureConversionMemory(ADC_MEM0,
-                ADC_VREFPOS_AVCC_VREFNEG_VSS,
-                ADC_INPUT_A15, ADC_NONDIFFERENTIAL_INPUTS);
+    /* Configures Pin 4.0, 4.2, and 6.1 as ADC input for the accelerometer*/
+    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P4,
+                                               GPIO_PIN0 | GPIO_PIN2,
+                                               GPIO_TERTIARY_MODULE_FUNCTION);
+    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P6, GPIO_PIN1,
+                                               GPIO_TERTIARY_MODULE_FUNCTION);
+    /* Initializing ADC (ADCOSC/64/8) */
+    ADC14_enableModule();
+    ADC14_initModule(ADC_CLOCKSOURCE_ADCOSC, ADC_PREDIVIDER_64, ADC_DIVIDER_8, 0);
 
-        ADC14_configureConversionMemory(ADC_MEM1,
-                ADC_VREFPOS_AVCC_VREFNEG_VSS,
-                ADC_INPUT_A9, ADC_NONDIFFERENTIAL_INPUTS);
+    /* Configuring ADC Memory (ADC_MEM0 - ADC_MEM1 (A15, A9)  with repeat)
+         * with internal 2.5v reference */
+    //Configuring ADC Memory ADC_MEM2-3-4 for the accelerometer
+    ADC14_configureMultiSequenceMode(ADC_MEM0, ADC_MEM4, true);
 
-        /* Enabling the interrupt when a conversion on channel 1 (end of sequence)
-         *  is complete and enabling conversions */
-        ADC14_enableInterrupt(ADC_INT1);
+    ADC14_configureConversionMemory(ADC_MEM0,
+            ADC_VREFPOS_AVCC_VREFNEG_VSS,
+            ADC_INPUT_A15, ADC_NONDIFFERENTIAL_INPUTS);
 
-        /* Enabling Interrupts */
-        Interrupt_enableInterrupt(INT_ADC14);
-        Interrupt_enableMaster();
+    ADC14_configureConversionMemory(ADC_MEM1,
+            ADC_VREFPOS_AVCC_VREFNEG_VSS,
+            ADC_INPUT_A9, ADC_NONDIFFERENTIAL_INPUTS);
 
-        /* Setting up the sample timer to automatically step through the sequence
-         * convert.
-         */
-        ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
+    //Configuring Conversion Memory ADC_MEM2 for the accelerometer
+    ADC14_configureConversionMemory(ADC_MEM2,
+                                    ADC_VREFPOS_AVCC_VREFNEG_VSS,
+                    ADC_INPUT_A14, ADC_NONDIFFERENTIAL_INPUTS);
+    ADC14_configureConversionMemory(ADC_MEM3,
+                                    ADC_VREFPOS_AVCC_VREFNEG_VSS,
+                        ADC_INPUT_A13, ADC_NONDIFFERENTIAL_INPUTS);
+    ADC14_configureConversionMemory(ADC_MEM4,
+                                    ADC_VREFPOS_AVCC_VREFNEG_VSS,
+                        ADC_INPUT_A11, ADC_NONDIFFERENTIAL_INPUTS);
 
-        /* Triggering the start of the sample */
-        ADC14_enableConversion();
-        ADC14_toggleConversionTrigger();
+    /* Enabling the interrupt when a conversion on channel 1 (end of sequence)
+     *  is complete and enabling conversions */
+    ADC14_enableInterrupt(ADC_INT1);
+
+    //Enable input for the Accelerometer
+    ADC14_enableInterrupt(ADC_INT2);
+
+    /* Enabling Interrupts */
+    Interrupt_enableInterrupt(INT_ADC14);
+    Interrupt_enableMaster();
+
+    /* Setting up the sample timer to automatically step through the sequence
+     * convert.
+     */
+    ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
+
+    /* Triggering the start of the sample */
+    ADC14_enableConversion();
+    ADC14_toggleConversionTrigger();
 }
+
 
 void init_all() {
     _graphicsInit();

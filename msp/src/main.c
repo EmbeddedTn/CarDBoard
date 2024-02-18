@@ -24,3 +24,10 @@ void TA1_0_IRQHandler(void) {
         INTERRUPTS_TA1_0[i]();
     }
 }
+
+void TA2_0_IRQHandler(void) {
+    int i = 0;
+    for(; i < N_INTERRUPTS_TA1_0; i++){
+        INTERRUPTS_TA1_0[i]();
+    }
+}

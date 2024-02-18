@@ -1,12 +1,15 @@
+#include "pages.h"
+
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
 #include <stdio.h>
 #include <stdint.h>
 
-// file initializing the speed limit background image
-#include "slb.h"
-#include "pages.h"
+#include "images.h"
+#include "car_front.h"
+#include "car_side.h"
+#include "../tilt/tilt.h"
 
 
 #define SPEED_FONT g_sFontCmss30b
@@ -18,19 +21,80 @@
 static uint16_t joystickBuffer[2];
 Graphics_Context g_sContext;
 
+Graphics_Image car_side_array[19];
+Graphics_Image car_front_array[19];
+
+void car_side_init(){
+        car_side_array[0] = car_side_output__45;
+        car_side_array[1] = car_side_output__40;
+        car_side_array[2] = car_side_output__35;
+        car_side_array[3] = car_side_output__30;
+        car_side_array[4] = car_side_output__25;
+        car_side_array[5] = car_side_output__20;
+        car_side_array[6] = car_side_output__15;
+        car_side_array[7] = car_side_output__10;
+        car_side_array[8] = car_side_output__5;
+        car_side_array[9] = car_side;
+        car_side_array[10] = car_side_output_5;
+        car_side_array[11] = car_side_output_10;
+        car_side_array[12] = car_side_output_15;
+        car_side_array[13] = car_side_output_20;
+        car_side_array[14] = car_side_output_25;
+        car_side_array[15] = car_side_output_30;
+        car_side_array[16] = car_side_output_35;
+        car_side_array[17] = car_side_output_40;
+        car_side_array[18] = car_side_output_45;
+}
+
+void car_front_init(){
+        car_front_array[0] = car_front_output__45;
+        car_front_array[1] = car_front_output__40;
+        car_front_array[2] = car_front_output__35;
+        car_front_array[3] = car_front_output__30;
+        car_front_array[4] = car_front_output__25;
+        car_front_array[5] = car_front_output__20;
+        car_front_array[6] = car_front_output__15;
+        car_front_array[7] = car_front_output__10;
+        car_front_array[8] = car_front_output__5;
+        car_front_array[9] = car_front;
+        car_front_array[10] = car_front_output_5;
+        car_front_array[11] = car_front_output_10;
+        car_front_array[12] = car_front_output_15;
+        car_front_array[13] = car_front_output_20;
+        car_front_array[14] = car_front_output_25;
+        car_front_array[15] = car_front_output_30;
+        car_front_array[16] = car_front_output_35;
+        car_front_array[17] = car_front_output_40;
+        car_front_array[18] = car_front_output_45;
+}
+
 volatile uint8_t current_page_number = 0;
 int16_t current_speed_limit = 69;
 int16_t current_speed = 12;
+
+static uint16_t resultsBuffer[2];
 
 float current_lon = 46.06705235237631;
 float current_lat = 11.149869220425288;
 
 int8_t* current_location_name = "Povo, Trento";
 
+// Moving snprintf to RAM to improve performance
+#pragma CODE_SECTION(snprintf, ".ram_functions")
+int snprintf(char* str, size_t size, const char* format, ...)
+{
+    int r;
+    va_list args;
+    va_start(args, format);
+    r = vsnprintf(str, size, format, args);
+    va_end(args);
+    return r;
+}
+
 
 void draw_speed_limit() {
     int8_t speed_limit[3];
-    sprintf((char*)speed_limit, "%hd", current_speed_limit);
+    snprintf((char*)speed_limit, sizeof(speed_limit), "%hd", current_speed_limit);
 
     Graphics_clearDisplay(&g_sContext);
 
@@ -43,7 +107,7 @@ void draw_speed_limit() {
 
 void draw_speed() {
     int8_t speed[3];
-    sprintf((char*)speed, "%hd", current_speed);
+    snprintf((char*)speed, sizeof(speed), "%hd", current_speed);
     int COLOR;
 
     // Checking if over speed limit
@@ -74,8 +138,8 @@ void draw_speed() {
 void draw_geolocation() {
     int8_t latitude[10];
     int8_t longitude[10];
-    sprintf((char*)latitude, "%f", current_lat);
-    sprintf((char*)longitude, "%f", current_lon);
+    snprintf((char*)latitude, sizeof(latitude), "%f", current_lat);
+    snprintf((char*)longitude, sizeof(longitude) , "%f", current_lon);
 
     Graphics_clearDisplay(&g_sContext);
     draw_title("Geolocation");
@@ -93,10 +157,22 @@ void draw_geolocation() {
 void draw_tilt() {
     Graphics_clearDisplay(&g_sContext);
     draw_title("Vehicle Tilt");
+    Graphics_drawImage(&g_sContext, &car_side, 10, 35);
+    Graphics_drawImage(&g_sContext, &car_front, 80, 35);
+    int8_t x_accelerometer[8];
+    int8_t y_accelerometer[8];
+
+    sprintf((char*) x_accelerometer, " %1.2f ", changeG(resultsBuffer[0]));
+    sprintf((char*) y_accelerometer, " %1.2f ", changeG(resultsBuffer[1]));
+    Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 70, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 80, 70, OPAQUE_TEXT);
+    Graphics_drawLineV(&g_sContext, 64, 25, 128);
+    Graphics_drawLineH(&g_sContext, 0, 128, 25);
 }
 
 void draw_title(int8_t* title) {
     Graphics_setFont(&g_sContext, &TITLE_FONT);
+    //Graphics_drawImage(&g_sContext, &front_car_image, 80, 35);
     Graphics_drawString(&g_sContext, title, AUTO_STRING_LENGTH, 5, 5, OPAQUE_TEXT);
     Graphics_setFont(&g_sContext, &DEFAULT_FONT);
 }
@@ -118,6 +194,7 @@ void draw_page() {
         break;
     default:
         draw_speed_limit();
+        current_page_number = 0;
         break;
     }
 }
@@ -132,8 +209,8 @@ void change_page(int8_t delta) {
 void update_speed_limit(uint16_t speed_limit) {
     current_speed_limit = speed_limit;
     if (current_page_number == 0) {
-        uint8_t speed_limit[3];
-        sprintf((char*)speed_limit, "%hd", current_speed_limit);
+        uint16_t speed_limit[3];
+        snprintf((char*)speed_limit, sizeof(speed_limit), "%hd", current_speed_limit);
 
         Graphics_setFont(&g_sContext, &SPEED_FONT);
         Graphics_drawStringCentered(&g_sContext, "    ", AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
@@ -147,8 +224,8 @@ void update_speed(uint16_t nSpeed) {
     current_speed = nSpeed;
 
     if (current_page_number == 1) {
-        uint8_t speed[3];
-        sprintf((char*)speed, "%hd", current_speed);
+        uint16_t speed[3];
+        snprintf((char*)speed, sizeof(speed), "%d", current_speed);
         int COLOR;
 
         // Checking if over speed limit
@@ -182,11 +259,51 @@ void update_geolocation(float lon, float lat, int8_t* location_name) {
     draw_page();
 }
 
+void update_car_side(float y_axis){
+    int interval_index;
+    if(y_axis>=-0.15 && y_axis <= 0.15){
+        interval_index = 9;
+    }else{
+        interval_index = (y_axis + 0.85) / 0.094;
+    }
+    Graphics_drawImage(&g_sContext, &car_side_array[interval_index], 80, 35);
+}
+
+void update_car_front(float x_axis){
+    int interval_index;
+        if(x_axis>=-0.15 && x_axis <= 0.15){
+            interval_index = 9;
+        }else{
+            interval_index = (x_axis + 0.85) / 0.094;
+        }
+        Graphics_drawImage(&g_sContext, &car_front_array[interval_index], 10, 35);
+}
+
+void update_tilt(){
+    if (current_page_number == 2){
+        int8_t x_accelerometer[8];
+        int8_t y_accelerometer[8];
+        float x_res = changeG(resultsBuffer[0]);
+        float y_res = changeG(resultsBuffer[1]);
+
+        sprintf((char*) x_accelerometer, " %1.2f ", x_res);
+        sprintf((char*) y_accelerometer, " %1.2f ", y_res);
+        Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 70, OPAQUE_TEXT);
+        Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 80, 70, OPAQUE_TEXT);
+
+        update_car_side(y_res);
+        update_car_front(x_res);
+
+    }
+}
+
+
+
 bool in_idle_state(int x) {
     return ((x>7000) && (x<9000));
 }
 
-// Joystick interrupt handler
+// Joystick and accelerometer interrupt handler
 void ADC14_IRQHandler(void) {
     uint64_t status;
     status = ADC14_getEnabledInterruptStatus();
@@ -205,6 +322,20 @@ void ADC14_IRQHandler(void) {
                 change_page(-1);
             }
         }
+    }
+
+    //Accelerometer
+    /* This interrupt is fired whenever a conversion is completed and placed in
+     * ADC_MEM2. This signals the end of conversion and the results array is
+     * grabbed and placed in resultsBuffer */
+
+    /* Accelerometer reading finished (ADC_MEM2-3-4 conversion completed) */
+    if (status & ADC_INT2)
+    {
+        /* Store ADC14 conversion results */
+        resultsBuffer[0] = ADC14_getResult(ADC_MEM2);
+        resultsBuffer[1] = ADC14_getResult(ADC_MEM3);
+        //printf("X-%d, Y-%d, Z-%d\n", resultsBuffer[0],resultsBuffer[1],resultsBuffer[2]);
     }
 }
 
