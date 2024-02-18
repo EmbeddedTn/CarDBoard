@@ -16,5 +16,6 @@ void initFont();
 void init_all();
 void _timerA1Init();
 void _fastTimerA2Init();
+void _initUART();
 
 #endif /* INCLUDE_INIT_H_ */

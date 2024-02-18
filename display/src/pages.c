@@ -72,15 +72,15 @@ void car_front_init(){
 }
 
 volatile uint8_t current_page_number = 0;
-int16_t current_speed_limit = 69;
-int16_t current_speed = 12;
+uint8_t current_speed_limit = 69;
+uint8_t current_speed = 12;
 
 static uint16_t resultsBuffer[2];
 
 float current_lon = 46.06705235237631;
 float current_lat = 11.149869220425288;
 
-int8_t* current_location_name = "Povo, Trento";
+int8_t* default_location_name = "Finding Location";
 
 // Moving snprintf to RAM to improve performance
 #pragma CODE_SECTION(snprintf, ".ram_functions")
@@ -224,12 +224,11 @@ void update_speed_limit(int16_t speed_limit) {
 }
 
 // Function to call on vechicle speed change
-void update_speed(int16_t nSpeed) {
+void update_speed(uint8_t* nSpeed) {
     current_speed = nSpeed;
 
     if (current_page_number == 1) {
-        int8_t speed[3];
-        snprintf((char*)speed, sizeof(speed), "%d", current_speed);
+
         int COLOR;
 
         // Checking if over speed limit
@@ -256,11 +255,15 @@ void update_speed(int16_t nSpeed) {
 }
 
 // Function to call on geolocation change
-void update_geolocation(float lon, float lat, int8_t* location_name) {
+void update_geolocation(int8_t* lon, int8_t* lat, int8_t* location_name) {
     current_lon = lon;
     current_lat = lat;
     current_location_name = location_name;
-    draw_page();
+
+
+    Graphics_drawString(&g_sContext, longitude, AUTO_STRING_LENGTH, 40, 35, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, latitude, AUTO_STRING_LENGTH, 40, 55, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, current_location_name, AUTO_STRING_LENGTH, 20, 105, OPAQUE_TEXT);
 }
 
 void update_car_side(float y_axis){

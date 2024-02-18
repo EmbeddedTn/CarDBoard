@@ -43,9 +43,9 @@ void loop() {
       // If new data, send req  (geocoding request)
       String response = sendReq(gps.location.lat(), gps.location.lng());
 
-      if(response != '')
+      if(response != "")
       {
-        JSONVar jsonRes = parseResponse(reponse);
+        JSONVar jsonRes = parseResponse(response);
         
         printKeys(jsonRes);
       }
@@ -59,8 +59,8 @@ String sendReq(float lat, float lon)
   HTTPClient http;
 
   // Build  URL
-  String url = exampleQuery + "&lan=" + String(lat, 6) + "&lon=" + String(lon, 6);
-  String payload = '';
+  String url = String(exampleQuery, sizeof(exampleQuery)) + "&lat=" + String(lat, 6) + "&lon=" + String(lon, 6);
+  String payload = "";
 
   // Start the HTTP request
   http.begin(url);
@@ -102,7 +102,7 @@ JSONVar parseResponse(String payload)
   if (JSON.typeof(jsonRes) == "undefined") 
   {
     Serial.println("Parsing failed!");
-    return;
+    return jsonRes;
   }
 
   // debug
@@ -114,11 +114,11 @@ JSONVar parseResponse(String payload)
 
 void printKeys(JSONVar res)
 {
-  JSONVar keys = jsonRes.keys();
+  JSONVar keys = res.keys();
     
   for (int i = 0; i < keys.length(); ++i) 
   {
-    JSONVar value = jsonRes[keys[i]];
+    JSONVar value = res[keys[i]];
     Serial.print(keys[i]);
     Serial.print(" = ");
     Serial.println(value);
