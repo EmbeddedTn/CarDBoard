@@ -5,7 +5,8 @@
 #include <stdint.h>
 
 // file initializing the speed limit background image
-#include "../include/slb.h"
+#include "slb.h"
+#include "pages.h"
 
 
 #define SPEED_FONT g_sFontCmss30b
@@ -128,25 +129,25 @@ void change_page(int8_t delta) {
 }
 
 // Function to call on speed_limit change
-void update_speed_limit(int16_t speed_limit) {
+void update_speed_limit(uint16_t speed_limit) {
     current_speed_limit = speed_limit;
     if (current_page_number == 0) {
-        int8_t speed_limit[3];
+        uint8_t speed_limit[3];
         sprintf((char*)speed_limit, "%hd", current_speed_limit);
 
         Graphics_setFont(&g_sContext, &SPEED_FONT);
         Graphics_drawStringCentered(&g_sContext, "    ", AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
-        Graphics_drawStringCentered(&g_sContext, speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
+        Graphics_drawStringCentered(&g_sContext, (int8_t*)speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
         Graphics_setFont(&g_sContext, &DEFAULT_FONT);
     }
 }
 
 // Function to call on vechicle speed change
-void update_speed(int16_t nSpeed) {
+void update_speed(uint16_t nSpeed) {
     current_speed = nSpeed;
 
     if (current_page_number == 1) {
-        int8_t speed[3];
+        uint8_t speed[3];
         sprintf((char*)speed, "%hd", current_speed);
         int COLOR;
 
@@ -161,7 +162,7 @@ void update_speed(int16_t nSpeed) {
 
         Graphics_setFont(&g_sContext, &SPEED_FONT);
         Graphics_drawStringCentered(&g_sContext, "    ", AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
-        Graphics_drawStringCentered(&g_sContext, speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
+        Graphics_drawStringCentered(&g_sContext, (int8_t*)speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
 
         Graphics_setForegroundColor(&g_sContext, COLOR);
         Graphics_setBackgroundColor(&g_sContext, COLOR);
