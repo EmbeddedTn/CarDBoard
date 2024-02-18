@@ -14,3 +14,4 @@ float changeG(uint16_t resultsBuffer){
         }
     }
 }
+

@@ -25,6 +25,7 @@ static uint16_t joystickBuffer[2];
 Graphics_Context g_sContext;
 
 Graphics_Image car_side_array[19];
+Graphics_Image car_front_array[19];
 
 void car_side_init(){
         car_side_array[0] = car_side_output__45;
@@ -46,6 +47,28 @@ void car_side_init(){
         car_side_array[16] = car_side_output_35;
         car_side_array[17] = car_side_output_40;
         car_side_array[18] = car_side_output_45;
+}
+
+void car_front_init(){
+        car_front_array[0] = car_front_output__45;
+        car_front_array[1] = car_front_output__40;
+        car_front_array[2] = car_front_output__35;
+        car_front_array[3] = car_front_output__30;
+        car_front_array[4] = car_front_output__25;
+        car_front_array[5] = car_front_output__20;
+        car_front_array[6] = car_front_output__15;
+        car_front_array[7] = car_front_output__10;
+        car_front_array[8] = car_front_output__5;
+        car_front_array[9] = car_front;
+        car_front_array[10] = car_front_output_5;
+        car_front_array[11] = car_front_output_10;
+        car_front_array[12] = car_front_output_15;
+        car_front_array[13] = car_front_output_20;
+        car_front_array[14] = car_front_output_25;
+        car_front_array[15] = car_front_output_30;
+        car_front_array[16] = car_front_output_35;
+        car_front_array[17] = car_front_output_40;
+        car_front_array[18] = car_front_output_45;
 }
 
 volatile uint8_t current_page_number = 0;
@@ -146,6 +169,8 @@ void draw_tilt() {
     sprintf((char*) y_accelerometer, " %1.2f ", changeG(resultsBuffer[1]));
     Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 70, OPAQUE_TEXT);
     Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 80, 70, OPAQUE_TEXT);
+    Graphics_drawLineV(&g_sContext, 64, 25, 128);
+    Graphics_drawLineH(&g_sContext, 0, 128, 25);
 }
 
 void draw_title(int8_t* title) {
@@ -245,7 +270,17 @@ void update_car_side(float y_axis){
     }else{
         interval_index = (y_axis + 0.85) / 0.094;
     }
-    Graphics_drawImage(&g_sContext, &car_side_array[interval_index], 10, 35);
+    Graphics_drawImage(&g_sContext, &car_side_array[interval_index], 80, 35);
+}
+
+void update_car_front(float x_axis){
+    int interval_index;
+        if(x_axis>=-0.15 && x_axis <= 0.15){
+            interval_index = 9;
+        }else{
+            interval_index = (x_axis + 0.85) / 0.094;
+        }
+        Graphics_drawImage(&g_sContext, &car_front_array[interval_index], 10, 35);
 }
 
 void update_tilt(){
@@ -261,7 +296,7 @@ void update_tilt(){
         Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 80, 70, OPAQUE_TEXT);
 
         update_car_side(y_res);
-        Graphics_drawImage(&g_sContext, &car_front, 80, 35);
+        update_car_front(x_res);
 
     }
 }
