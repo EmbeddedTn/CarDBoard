@@ -1,4 +1,3 @@
-#include <src/mods.h>
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
@@ -25,3 +24,8 @@ void TA1_0_IRQHandler(void) {
 void TA2_0_IRQHandler(void) {
     irq_dispatcher(INTERRUPTS_TA2_0, N_INTERRUPTS_TA2_0);
 }
+
+void EUSCIA2_IRQHandler(void) {
+    irq_dispatcher(INTERRUPTS_EUSCIA2, N_INTERRUPTS_TA2_0);
+}
+

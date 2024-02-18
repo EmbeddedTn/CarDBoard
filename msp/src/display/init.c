@@ -18,7 +18,6 @@ const Timer_A_UpModeConfig upConfig =
         TIMER_A_DO_CLEAR                        // Clear value
 };
 
-
 void _graphicsInit(){
     /* Initializes display */
     Crystalfontz128x128_Init();
@@ -33,7 +32,6 @@ void _graphicsInit(){
     Graphics_setBackgroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
     GrContextFontSet(&g_sContext, &g_sFontFixed6x8);
     Graphics_clearDisplay(&g_sContext);
-
 }
 
 void _displayButtonsInit() {
@@ -123,7 +121,6 @@ void _adcInit(){
     ADC14_enableConversion();
     ADC14_toggleConversionTrigger();
 }
-
 
 void init_all() {
     _graphicsInit();

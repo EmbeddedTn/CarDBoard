@@ -16,10 +16,13 @@ const char* exampleQuery = "https://nominatim.openstreetmap.org/reverse?format=j
 #define GPS_SERIAL Serial2  
 #define RATE 9600
 
+//0 Indirizzo, 1 Velocità, 2 Limite Velocità, 3 Lat, 4 Lon
+
 // Define TinyGPS++ object
 TinyGPSPlus gps;
 
-void setup() {
+void setup() 
+{
   // Start serial 
   Serial.begin(115200);
   GPS_SERIAL.begin(RATE);
@@ -34,7 +37,8 @@ void setup() {
   Serial.println("Connected to WiFi");
 }
 
-void loop() {
+void loop() 
+{
   // Update GPS data
   while (GPS_SERIAL.available() > 0 && WiFi.status() == WL_CONNECTED) 
   {
@@ -43,9 +47,9 @@ void loop() {
       // If new data, send req  (geocoding request)
       String response = sendReq(gps.location.lat(), gps.location.lng());
 
-      if(response != '')
+      if(response != "")
       {
-        JSONVar jsonRes = parseResponse(reponse);
+        JSONVar jsonRes = parseResponse(response);
         
         printKeys(jsonRes);
       }
@@ -59,8 +63,8 @@ String sendReq(float lat, float lon)
   HTTPClient http;
 
   // Build  URL
-  String url = exampleQuery + "&lan=" + String(lat, 6) + "&lon=" + String(lon, 6);
-  String payload = '';
+  String url = String(exampleQuery, sizeof(exampleQuery)) + "&lat=" + String(lat, 6) + "&lon=" + String(lon, 6);
+  String payload = "";
 
   // Start the HTTP request
   http.begin(url);
@@ -93,6 +97,7 @@ String sendReq(float lat, float lon)
   return payload;
 }
 
+
 JSONVar parseResponse(String payload)
 {
   // Create var
@@ -102,7 +107,7 @@ JSONVar parseResponse(String payload)
   if (JSON.typeof(jsonRes) == "undefined") 
   {
     Serial.println("Parsing failed!");
-    return;
+    return jsonRes;
   }
 
   // debug
@@ -112,15 +117,58 @@ JSONVar parseResponse(String payload)
   return jsonRes;
 }
 
+String sendAddress(JSONVar jsonRes)
+{
+  String address = jsonRes["address"];
+  return "0" + address;
+}
+
+String sendSpeed(JSONVar jsonRes)
+{
+   // TODO
+  // return "1" + // 
+}
+
+String sendLimit(JSONVar jsonRes)
+{
+  int limit = 50;
+  String type = jsonRes["highway"];
+  switch (type){
+    case "motorway": limit = 130;
+    break;
+    case "primary": limit = 110;
+    break;
+    // case "motorway": limit = 130;
+    // break;
+    // case "motorway": limit = 130;
+    // break;
+    default: limit = 30;
+  }
+  return "2" +  (String) limit
+}
+
+String sendLat(float lat)
+{
+  return "3" + (String) lat;
+}
+
+String sendLat(float lon)
+{
+  return "4" + (String) lon;
+}
+
+
 void printKeys(JSONVar res)
 {
-  JSONVar keys = jsonRes.keys();
+  JSONVar keys = res.keys();
     
   for (int i = 0; i < keys.length(); ++i) 
   {
-    JSONVar value = jsonRes[keys[i]];
+    JSONVar value = res[keys[i]];
     Serial.print(keys[i]);
     Serial.print(" = ");
     Serial.println(value);
   }
 }
+
+
