@@ -40,23 +40,23 @@ void update_value(request req){
         case ADDRESS:
             location_address[counter] = '\0';
             //TODO
-//            update_address(location_address);
+            update_address(location_address);
             break;
         case SPEED:
             speed[counter] = '\0';
-//            update_speed(speed);
+            update_speed(speed);
             break;
         case LIMIT:
            speed_limit[counter] = '\0';
-//           update_speed_limit(speed_limit);
+           update_speed_limit(speed_limit);
            break;
         case LAT:
             lat[counter] = '\0';
-//            update_lat(lat);
+            update_lat(lat);
             break;
         case LON:
             lon[counter] = '\0';
-//            update_lon(lon);
+            update_lon(lon);
             break;
         default:
             first = true;
@@ -74,7 +74,7 @@ void interrupt_EUSCIA2__esp(){
         GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
         RXData = UART_receiveData(EUSCI_A2_BASE);
 
-        // 0 Indirizzo, 1 Velocità, 2 Limite Velocità, 3 Lat, 4 Lon
+        // 0 Address, 1 Speed, 2 Speed Limit, 3 Lat, 4 Lon
         if(RXData != '\n'){
             if(first){
                req = RXData;
@@ -107,11 +107,10 @@ void interrupt_EUSCIA2__esp(){
         } else {
             GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
             first = true;
-//            update_value();
+            update_value(req);
             counter = 0;
         }
 
-//        fflush(stdout);
         Interrupt_disableSleepOnIsrExit();
     }
 

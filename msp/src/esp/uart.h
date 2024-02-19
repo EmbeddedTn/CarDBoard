@@ -3,6 +3,13 @@
 
 void sendString(char* str);
 
+void requestPosition();
+void requestSpeed();
+void requestLimit();
+void requestLat();
+void requestLon();
+void sendError();
+
 typedef enum request{
     ADDRESS = 0,
     SPEED = 1,

@@ -11,8 +11,8 @@
 const Timer_A_UpModeConfig upConfig =
 {
         TIMER_A_CLOCKSOURCE_ACLK,               // 32768 Hz
-        TIMER_A_CLOCKSOURCE_DIVIDER_8,          // 32768 / 8 = 4096 Hz
-        TIMER_PERIOD,                           // 11718 / 4096 ~= 2.86s the interrupt is registered
+        TIMER_A_CLOCKSOURCE_DIVIDER_4,          // 32768 / 8 = 8192 Hz
+        TIMER_PERIOD,                           // 11718 / 8192 ~= each 1.43s the interrupt is registered
         TIMER_A_TAIE_INTERRUPT_DISABLE,         // Disable Timer interrupt
         TIMER_A_CCIE_CCR0_INTERRUPT_ENABLE ,    // Enable CCR0 interrupt
         TIMER_A_DO_CLEAR                        // Clear value

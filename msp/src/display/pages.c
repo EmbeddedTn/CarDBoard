@@ -1,10 +1,12 @@
 #include "pages.h"
+#include "../esp/esp.h"
 
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h> //for atoi
 
 #include "images.h"
 #include "car_front.h"
@@ -69,15 +71,18 @@ void car_front_init(){
 }
 
 volatile uint8_t current_page_number = 0;
-uint8_t current_speed_limit = 69;
-uint8_t current_speed = 12;
+uint8_t* current_speed = "012";
+uint8_t* current_speed_limit = "69";
+
+int numeric_current_speed = 0;
+int numeric_current_speed_limit = 0;
 
 static uint16_t resultsBuffer[2];
 
-uint8_t* current_lon = "46.06705235237631";
-uint8_t* current_lat = "11.149869220425288";
+uint8_t* current_lon = "46.0670"; //length: 8
+uint8_t* current_lat = "11.1498"; //length: 8
 
-const uint8_t* default_location_name = "Finding Location";
+const uint8_t default_location_name[128] = "Finding Location";
 uint8_t* current_location_name = "";
 
 // Moving snprintf to RAM to improve performance
@@ -93,27 +98,22 @@ int snprintf(char* str, size_t size, const char* format, ...){
 
 
 void draw_speed_limit() {
-    int8_t speed_limit[3];
-    snprintf((char*)speed_limit, sizeof(speed_limit), "%hd", current_speed_limit);
-
     Graphics_clearDisplay(&g_sContext);
 
     Graphics_drawImage(&g_sContext, &slb_image, 0, 0);
     Graphics_setFont(&g_sContext, &SPEED_FONT);
-    Graphics_drawStringCentered(&g_sContext, speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, current_speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
     Graphics_setFont(&g_sContext, &DEFAULT_FONT);
     draw_title("Speed Limit");
 }
 
 void draw_speed() {
-    int8_t speed[3];
-    snprintf((char*)speed, sizeof(speed), "%hd", current_speed);
     int COLOR;
 
     // Checking if over speed limit
-    if (current_speed > current_speed_limit) {
+    if (numeric_current_speed > numeric_current_speed_limit) {
         COLOR = GRAPHICS_COLOR_RED;
-    } else if (abs(current_speed - current_speed_limit) < 5) {
+    } else if (abs(numeric_current_speed - numeric_current_speed_limit) < 5) {
         COLOR = GRAPHICS_COLOR_ORANGE;
     } else {
         COLOR = GRAPHICS_COLOR_GREEN;
@@ -123,7 +123,7 @@ void draw_speed() {
     draw_title("Speed");
 
     Graphics_setFont(&g_sContext, &SPEED_FONT);
-    Graphics_drawStringCentered(&g_sContext, speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, current_speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
 
     Graphics_setForegroundColor(&g_sContext, COLOR);
     Graphics_setBackgroundColor(&g_sContext, COLOR);
@@ -201,30 +201,30 @@ void change_page(int8_t delta) {
 }
 
 // Function to call on speed_limit change
-void update_speed_limit(uint16_t speed_limit) {
+void update_speed_limit(uint8_t* speed_limit) {
     current_speed_limit = speed_limit;
+    numeric_current_speed_limit = atoi(current_speed_limit);
     if (current_page_number == 0) {
-        uint16_t speed_limit[3];
-        snprintf((char*)speed_limit, sizeof(speed_limit), "%hd", current_speed_limit);
 
         Graphics_setFont(&g_sContext, &SPEED_FONT);
         Graphics_drawStringCentered(&g_sContext, "    ", AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
-        Graphics_drawStringCentered(&g_sContext, (int8_t*)speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
+        Graphics_drawStringCentered(&g_sContext, (int8_t*)current_speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
         Graphics_setFont(&g_sContext, &DEFAULT_FONT);
     }
 }
 
 // Function to call on vechicle speed change
-void update_speed(uint8_t nSpeed) {
+void update_speed(uint8_t* nSpeed) {
     current_speed = nSpeed;
+    numeric_current_speed = atoi(nSpeed);
 
     if (current_page_number == 1) {
         int COLOR;
 
         // Checking if over speed limit
-        if (current_speed > current_speed_limit) {
+        if (numeric_current_speed > numeric_current_speed_limit) {
             COLOR = GRAPHICS_COLOR_RED;
-        } else if (abs(current_speed - current_speed_limit) < 5) {
+        } else if (abs(numeric_current_speed - numeric_current_speed_limit) < 5) {
             COLOR = GRAPHICS_COLOR_ORANGE;
         } else {
             COLOR = GRAPHICS_COLOR_GREEN;
@@ -244,16 +244,20 @@ void update_speed(uint8_t nSpeed) {
     }
 }
 
-// Function to call on geolocation change
-void update_geolocation(uint8_t* lon, uint8_t* lat, uint8_t* location_name) {
-    current_lon = lon;
-    current_lat = lat;
+// Function to call on location change
+void update_address(uint8_t* location_name){
     current_location_name = location_name;
+    Graphics_drawString(&g_sContext, (int8_t*)current_location_name, AUTO_STRING_LENGTH, 20, 105, OPAQUE_TEXT);
+}
 
-
-    Graphics_drawString(&g_sContext, (int8_t*)current_lon, AUTO_STRING_LENGTH, 40, 35, OPAQUE_TEXT);
+void update_lat(uint8_t* lat){
+    current_lat = lat;
     Graphics_drawString(&g_sContext, (int8_t*)current_lat, AUTO_STRING_LENGTH, 40, 55, OPAQUE_TEXT);
-    Graphics_drawString(&g_sContext, (int8_t*)location_name, AUTO_STRING_LENGTH, 20, 105, OPAQUE_TEXT);
+}
+
+void update_lon(uint8_t* lon) {
+    current_lon = lon;
+    Graphics_drawString(&g_sContext, (int8_t*)current_lon, AUTO_STRING_LENGTH, 40, 35, OPAQUE_TEXT);
 }
 
 void update_car_side(float y_axis){
