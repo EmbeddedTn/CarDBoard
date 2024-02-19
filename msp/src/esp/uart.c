@@ -1,41 +1,40 @@
 #include "uart.h"
+#include "esp.h"
 
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
 
-void sendString(char* str) {
-    while(*str != '\0') {
-        UART_transmitData(EUSCI_A2_BASE, *str);
-        str++;
-    }
-}
-
 void requestPosition(){
-    char sendPosition[2] = "0";
-    sendString(sendPosition);
+    if(!can_request[0]) return;
+    can_request[0] = 0;
+    UART_transmitData(EUSCI_A2_BASE, '0');
 }
 
 void requestSpeed(){
-    char sendSpeed[2] = "1";
-    sendString(sendSpeed);
+    if(!can_request[1]) return;
+    can_request[1] = 0;
+    UART_transmitData(EUSCI_A2_BASE, '1');
 }
 
 void requestLimit(){
-    char sendLimit[2] = "2";
-    sendString(sendLimit);
+    if(!can_request[2]) return;
+    can_request[2] = 0;
+    UART_transmitData(EUSCI_A2_BASE, '2');
 }
 
 void requestLat(){
-    char sendLat[2] = "3";
-    sendString(sendLat);
+    if(!can_request[3]) return;
+    can_request[3] = 0;
+    UART_transmitData(EUSCI_A2_BASE, '3');
 }
 
 void requestLon(){
-    char sendLon[2] = "4";
-    sendString(sendLon);
+    if(!can_request[4]) return;
+    can_request[4] = 0;
+    UART_transmitData(EUSCI_A2_BASE, '4');
 }
-
-void sendError(){
-    char sendError[4] = "ERR";
-    sendString(sendError);
-}
+//
+//void sendError(){
+//    char sendError[4] = "ERR";
+//    sendString(sendError);
+//}

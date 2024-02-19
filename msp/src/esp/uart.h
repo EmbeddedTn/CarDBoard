@@ -11,11 +11,11 @@ void requestLon();
 void sendError();
 
 typedef enum request{
-    ADDRESS = 0,
-    SPEED = 1,
-    LIMIT = 2,
-    LAT = 3,
-    LON = 4,
+    ADDRESS = '0',
+    SPEED = '1',
+    LIMIT = '2',
+    LAT = '3',
+    LON = '4',
     UNSET = -1
 } request;
 

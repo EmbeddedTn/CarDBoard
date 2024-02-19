@@ -21,14 +21,15 @@ void setup__display(){
 }
 
 void interrupt_TA1_0__display(void){ //slow interrupt
-    if(current_page_number == 0 || current_page_number == 1) {
+    if(current_page_number == 0) {
+        requestLimit();
+    } else if (current_page_number == 1) {
         requestSpeed();
         requestLimit();
-    }
-    if(current_page_number == 3){
-        requestPosition();
+    } else if (current_page_number == 3){
         requestLat();
         requestLon();
+        requestPosition();
     }
     Timer_A_clearCaptureCompareInterrupt(TIMER_A1_BASE,
             TIMER_A_CAPTURECOMPARE_REGISTER_0);

@@ -10,7 +10,7 @@ uint8_t RXData = 0;
 //the geographical address in which the gps is located
 uint8_t location_address[MAX_SIZE_READ];
 int8_t stato_comm = -1;
-bool first = true;
+volatile bool first = true;
 
 uint8_t lat[MAX_SIZE_COORDINATES];
 uint8_t lon[MAX_SIZE_COORDINATES];
@@ -18,24 +18,26 @@ uint8_t lon[MAX_SIZE_COORDINATES];
 uint8_t speed[4];
 uint8_t speed_limit[4];
 
-request req = UNSET;
+uint8_t can_request[5] = {1, 1, 1, 1, 1};
 
-uint8_t counter = 0;
+volatile request req = UNSET;
+
+volatile uint8_t counter = 0;
 
 const eUSCI_UART_ConfigV1 uartConfig = {
         EUSCI_A_UART_CLOCKSOURCE_SMCLK,          // SMCLK Clock Source
-        26,                                      // divider
+        13,                                      // divider
         0,                                       // UCxBRF = 0
-        111,                                      // UCxBRS
+        37,                                      // UCxBRS
         EUSCI_A_UART_NO_PARITY,                  // No Parity
         EUSCI_A_UART_LSB_FIRST,                  // LSB First
         EUSCI_A_UART_ONE_STOP_BIT,               // One stop bit
         EUSCI_A_UART_MODE,                       // UART mode
         EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION,  // Oversampling
-        EUSCI_A_UART_8_BIT_LEN                  // 8 bit data length
 };
 
 void update_value(request req){
+    can_request[req - '0'] = 1;
     switch(req) {
         case ADDRESS:
             location_address[counter] = '\0';
@@ -89,7 +91,7 @@ void interrupt_EUSCIA2__esp(){
                         break;
                     case LIMIT:
                         speed_limit[counter] = RXData;
-                       break;
+                        break;
                     case LAT:
                         lat[counter] = RXData;
                         break;
@@ -110,10 +112,7 @@ void interrupt_EUSCIA2__esp(){
             update_value(req);
             counter = 0;
         }
-
-        Interrupt_disableSleepOnIsrExit();
     }
-
 }
 
 void setup__esp() {
@@ -138,5 +137,5 @@ void setup__esp() {
     UART_enableInterrupt(EUSCI_A2_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT);
     Interrupt_enableInterrupt(INT_EUSCIA2);
 
-    UART_transmitData(EUSCI_A2_BASE, TXData);
+//    UART_transmitData(EUSCI_A2_BASE, TXData);
 }

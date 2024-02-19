@@ -17,4 +17,5 @@ encoding//Debug/src/tilt/subdir_vars.mk=UTF-8
 encoding//Debug/subdir_rules.mk=UTF-8
 encoding//Debug/subdir_vars.mk=UTF-8
 encoding//src/esp/esp.c=UTF-8
+encoding//src/esp/uart.c=UTF-8
 encoding//src/main.c=UTF-8

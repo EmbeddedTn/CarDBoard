@@ -79,8 +79,8 @@ int numeric_current_speed_limit = 0;
 
 static uint16_t resultsBuffer[2];
 
-uint8_t* current_lon = "46.0670"; //length: 8
-uint8_t* current_lat = "11.1498"; //length: 8
+uint8_t* current_lon = "?"; //length: 8
+uint8_t* current_lat = "?"; //length: 8
 
 const uint8_t default_location_name[128] = "Finding Location";
 uint8_t* current_location_name = "";
@@ -159,8 +159,8 @@ void draw_tilt() {
 
     sprintf((char*) x_accelerometer, " %1.2f ", changeG(resultsBuffer[0]));
     sprintf((char*) y_accelerometer, " %1.2f ", changeG(resultsBuffer[1]));
-    Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 10, 70, OPAQUE_TEXT);
-    Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 80, 70, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, x_accelerometer, AUTO_STRING_LENGTH, 80, 70, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, y_accelerometer, AUTO_STRING_LENGTH, 10, 70, OPAQUE_TEXT);
     Graphics_drawLineV(&g_sContext, 64, 25, 128);
     Graphics_drawLineH(&g_sContext, 0, 128, 25);
 }
@@ -255,7 +255,7 @@ void update_lat(uint8_t* lat){
     Graphics_drawString(&g_sContext, (int8_t*)current_lat, AUTO_STRING_LENGTH, 40, 55, OPAQUE_TEXT);
 }
 
-void update_lon(uint8_t* lon) {
+void update_lon(uint8_t* lon){
     current_lon = lon;
     Graphics_drawString(&g_sContext, (int8_t*)current_lon, AUTO_STRING_LENGTH, 40, 35, OPAQUE_TEXT);
 }
