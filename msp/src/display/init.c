@@ -2,14 +2,10 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
 #include "LcdDriver/Crystalfontz128x128_ST7735.h"
-#include "../LcdDriver/HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.h"
-#include "../include/HAL_I2C.h"
-#include "../include/HAL_TMP006.h"
+#include "LcdDriver/HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.h"
 
-#include "../include/pages.h"
-#include "../include/init.h"
-
-#define TIMER_PERIOD 0x2DC6 // 11718
+#include "pages.h"
+#include "init.h"
 
 /* Timer_A UpMode Configuration Parameter */
 const Timer_A_UpModeConfig upConfig =
@@ -21,34 +17,6 @@ const Timer_A_UpModeConfig upConfig =
         TIMER_A_CCIE_CCR0_INTERRUPT_ENABLE ,    // Enable CCR0 interrupt
         TIMER_A_DO_CLEAR                        // Clear value
 };
-
-const Timer_A_UpModeConfig fastUpConfig =
-{
-        TIMER_A_CLOCKSOURCE_ACLK,               // 32768 Hz
-        TIMER_A_CLOCKSOURCE_DIVIDER_1,          // 32768 / 2 = 16384 Hz
-        TIMER_PERIOD,                           // every ~= 0.71 s the interrupt is registered
-        TIMER_A_TAIE_INTERRUPT_DISABLE,         // Disable Timer interrupt
-        TIMER_A_CCIE_CCR0_INTERRUPT_ENABLE ,    // Enable CCR0 interrupt
-        TIMER_A_DO_CLEAR                        // Clear value
-};
-
-
-void _timerA1Init() {
-    Timer_A_configureUpMode(TIMER_A1_BASE, &upConfig);
-
-    /* Enabling interrupts and starting the timer */
-    Interrupt_enableSleepOnIsrExit();
-    Interrupt_enableInterrupt(INT_TA1_0);
-    Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);
-}
-
-//faster timer for updating tilting
-void _fastTimerA2Init(){
-    Timer_A_configureUpMode(TIMER_A2_BASE, &fastUpConfig);
-
-    Interrupt_enableInterrupt(INT_TA2_0);
-    Timer_A_startCounter(TIMER_A2_BASE, TIMER_A_UP_MODE);
-}
 
 void _graphicsInit(){
     /* Initializes display */
@@ -64,7 +32,6 @@ void _graphicsInit(){
     Graphics_setBackgroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
     GrContextFontSet(&g_sContext, &g_sFontFixed6x8);
     Graphics_clearDisplay(&g_sContext);
-
 }
 
 void _displayButtonsInit() {
@@ -86,6 +53,12 @@ void _displayButtonsInit() {
 
 
     Interrupt_enableMaster();
+}
+
+void _timerA1Init() {
+    Timer_A_configureUpMode(TIMER_A1_BASE, &upConfig);
+    Interrupt_enableInterrupt(INT_TA1_0);
+    Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);
 }
 
 void _adcInit(){
@@ -149,33 +122,10 @@ void _adcInit(){
     ADC14_toggleConversionTrigger();
 }
 
-void _hwInit(){
-    /* Halting WDT and disabling master interrupts */
-    WDT_A_holdTimer();
-    Interrupt_disableMaster();
-
-    /* Set the core voltage level to VCORE1 */
-    PCM_setCoreVoltageLevel(PCM_VCORE1);
-
-    /* Set 2 flash wait states for Flash bank 0 and 1*/
-    FlashCtl_setWaitState(FLASH_BANK0, 2);
-    FlashCtl_setWaitState(FLASH_BANK1, 2);
-
-    /* Initializes Clock System */
-    CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_48);
-    CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-    CS_initClockSignal(CS_HSMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-    CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-    CS_initClockSignal(CS_ACLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-}
-
-
 void init_all() {
-    _hwInit();
     _graphicsInit();
     _displayButtonsInit();
     _adcInit();
     _timerA1Init();
-    _fastTimerA2Init();
 }
 

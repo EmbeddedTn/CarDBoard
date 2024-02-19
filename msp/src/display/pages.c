@@ -1,18 +1,15 @@
-#include <include/images.h>
+#include "pages.h"
+
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
 #include <stdio.h>
 #include <stdint.h>
 
-// file initializing the images
-#include "../include/images.h"
-#include "../include/car_front.h"
-#include "../include/car_side.h"
-
-// accelerometer functions
-#include "../include/accelerometer.h"
-
+#include "images.h"
+#include "car_front.h"
+#include "car_side.h"
+#include "../tilt/tilt.h"
 
 
 #define SPEED_FONT g_sFontCmss30b
@@ -72,20 +69,20 @@ void car_front_init(){
 }
 
 volatile uint8_t current_page_number = 0;
-int16_t current_speed_limit = 69;
-int16_t current_speed = 12;
+uint8_t current_speed_limit = 69;
+uint8_t current_speed = 12;
 
 static uint16_t resultsBuffer[2];
 
-float current_lon = 46.06705235237631;
-float current_lat = 11.149869220425288;
+uint8_t* current_lon = "46.06705235237631";
+uint8_t* current_lat = "11.149869220425288";
 
-int8_t* current_location_name = "Povo, Trento";
+const uint8_t* default_location_name = "Finding Location";
+uint8_t* current_location_name = "";
 
 // Moving snprintf to RAM to improve performance
 #pragma CODE_SECTION(snprintf, ".ram_functions")
-int snprintf(char* str, size_t size, const char* format, ...)
-{
+int snprintf(char* str, size_t size, const char* format, ...){
     int r;
     va_list args;
     va_start(args, format);
@@ -139,22 +136,17 @@ void draw_speed() {
 }
 
 void draw_geolocation() {
-    int8_t latitude[10];
-    int8_t longitude[10];
-    snprintf((char*)latitude, sizeof(latitude), "%f", current_lat);
-    snprintf((char*)longitude, sizeof(longitude) , "%f", current_lon);
-
     Graphics_clearDisplay(&g_sContext);
     draw_title("Geolocation");
 
     Graphics_drawString(&g_sContext, "Lon: ", AUTO_STRING_LENGTH, 10, 35, OPAQUE_TEXT);
-    Graphics_drawString(&g_sContext, longitude, AUTO_STRING_LENGTH, 40, 35, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, (int8_t*)current_lon, AUTO_STRING_LENGTH, 40, 35, OPAQUE_TEXT);
 
     Graphics_drawString(&g_sContext, "Lat: ", AUTO_STRING_LENGTH, 10, 55, OPAQUE_TEXT);
-    Graphics_drawString(&g_sContext, latitude, AUTO_STRING_LENGTH, 40, 55, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, (int8_t*)current_lat, AUTO_STRING_LENGTH, 40, 55, OPAQUE_TEXT);
 
     Graphics_drawString(&g_sContext, "Location name:", AUTO_STRING_LENGTH, 10, 85, OPAQUE_TEXT);
-    Graphics_drawString(&g_sContext, current_location_name, AUTO_STRING_LENGTH, 20, 105, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, (int8_t *) current_location_name, AUTO_STRING_LENGTH, 20, 105, OPAQUE_TEXT);
 }
 
 void draw_tilt() {
@@ -209,27 +201,24 @@ void change_page(int8_t delta) {
 }
 
 // Function to call on speed_limit change
-void update_speed_limit(int16_t speed_limit) {
+void update_speed_limit(uint16_t speed_limit) {
     current_speed_limit = speed_limit;
     if (current_page_number == 0) {
-
-        int8_t speed_limit[3];
+        uint16_t speed_limit[3];
         snprintf((char*)speed_limit, sizeof(speed_limit), "%hd", current_speed_limit);
 
         Graphics_setFont(&g_sContext, &SPEED_FONT);
         Graphics_drawStringCentered(&g_sContext, "    ", AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
-        Graphics_drawStringCentered(&g_sContext, speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
+        Graphics_drawStringCentered(&g_sContext, (int8_t*)speed_limit, AUTO_STRING_LENGTH, 64, 64, OPAQUE_TEXT);
         Graphics_setFont(&g_sContext, &DEFAULT_FONT);
     }
 }
 
 // Function to call on vechicle speed change
-void update_speed(int16_t nSpeed) {
+void update_speed(uint8_t nSpeed) {
     current_speed = nSpeed;
 
     if (current_page_number == 1) {
-        int8_t speed[3];
-        snprintf((char*)speed, sizeof(speed), "%d", current_speed);
         int COLOR;
 
         // Checking if over speed limit
@@ -243,7 +232,7 @@ void update_speed(int16_t nSpeed) {
 
         Graphics_setFont(&g_sContext, &SPEED_FONT);
         Graphics_drawStringCentered(&g_sContext, "    ", AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
-        Graphics_drawStringCentered(&g_sContext, speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
+        Graphics_drawStringCentered(&g_sContext, (int8_t*) current_speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
 
         Graphics_setForegroundColor(&g_sContext, COLOR);
         Graphics_setBackgroundColor(&g_sContext, COLOR);
@@ -256,11 +245,15 @@ void update_speed(int16_t nSpeed) {
 }
 
 // Function to call on geolocation change
-void update_geolocation(float lon, float lat, int8_t* location_name) {
+void update_geolocation(uint8_t* lon, uint8_t* lat, uint8_t* location_name) {
     current_lon = lon;
     current_lat = lat;
     current_location_name = location_name;
-    draw_page();
+
+
+    Graphics_drawString(&g_sContext, (int8_t*)current_lon, AUTO_STRING_LENGTH, 40, 35, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, (int8_t*)current_lat, AUTO_STRING_LENGTH, 40, 55, OPAQUE_TEXT);
+    Graphics_drawString(&g_sContext, (int8_t*)location_name, AUTO_STRING_LENGTH, 20, 105, OPAQUE_TEXT);
 }
 
 void update_car_side(float y_axis){
