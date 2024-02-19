@@ -44,6 +44,25 @@ void loop()
   {
     if (gps.encode(GPS_SERIAL.read())) 
     {
+      String req = sendReq(gps.location.lat(), gps.location.lng());
+      JSONVar jsonRes = parseResponse(req);
+
+      String c = Serial.read();
+      switch (c)
+      {
+        case "0": Serial.write(sendAddress(jsonRes));
+        break;
+        case "1": Serial.write(sendSpeed(jsonRes));
+        break;
+        case "2": Serial.write(sendLimit(jsonRes));
+        break;
+        case "3": Serial.write(sendLat(gps.location.lat()));
+        break;  
+        case "4": Serial.write(sendLon(gps.location.lng()));
+        break;
+        default: Serial.write("ERR");
+          break;
+      }
       // If new data, send req  (geocoding request)
       String response = sendReq(gps.location.lat(), gps.location.lng());
 
