@@ -150,6 +150,12 @@ String sendSpeed(JSONVar jsonRes)
 
 String sendLimit(JSONVar jsonRes)
 {
+  JSONVar keys = jsonRes.keys();
+  for(int i = 0; i < keys.length(); ++i)
+  {
+    if(keys[i] == "maxspeed")
+      return "2" + (String) jsonRes["maxspeed"];
+  }
   int limit = 50;
   String type = jsonRes["highway"];
   switch (type){
