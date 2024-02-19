@@ -159,14 +159,16 @@ String sendLimit(JSONVar jsonRes)
   int limit = 50;
   String type = jsonRes["highway"];
   switch (type){
-    case "motorway": limit = 130;
+    case "motorway" || "trunk": limit = 130;
     break;
     case "primary": limit = 110;
     break;
-    // case "motorway": limit = 130;
-    // break;
-    // case "motorway": limit = 130;
-    // break;
+    case "secondary": limit = 90;
+    break;
+    case "tertiary" || "motorway_link" || "trunk_link" || "primary_link" || "secondary_link" || "tertiary_link": limit = 70;
+    break;
+    case "residential" || "unclassified" || "living_street": limit = 50;
+    break;
     default: limit = 30;
   }
   return "2" +  (String) limit
