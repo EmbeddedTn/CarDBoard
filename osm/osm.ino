@@ -2,9 +2,10 @@
 #include <WiFi.h>
 #include <ArduinoJson.h>
 #include <TinyGPS++.h>
+#include <HardwareSerial.h>
 
-const char* ssid = "Degrandi";
-const char* password = "bucciadibanana";
+const char* ssid = "wireless-ext";
+const char* password = "cassonetto5";
 
 //Your Domain name with URL path or IP address with path
 // const char* serverName = "http://192.168.1.106:1880/get-sensor";
@@ -14,16 +15,18 @@ const char* password = "bucciadibanana";
 #define OVERPASS_URL "http://overpass-api.de/api/interpreter"
 #define OVERPASS_QUERY1 "[out:json][maxsize:20000]; way[highway][highway!~\"(footway|track|cycleway|steps|pedestrian|construction)\"][access!~\"(no|private)\"]("
 #define OVERPASS_QUERY2 "); out;"
-#define BBOX_L 5
+#define BBOX_L 20
+#define DOCSIZE 8192
 
 enum Request {
   POST,
   GET
 };
 
+HardwareSerial GPSSerial(1);
+
 #define MSPSerial Serial2
-//#define PCSerial Serial
-#define GPSSerial Serial
+#define PCSerial Serial
 #define RATE 9600
 
 // Define TinyGPS++ object
@@ -31,16 +34,12 @@ TinyGPSPlus gps;
 HTTPClient** http_nom;
 HTTPClient** http_op;
 
-void setup() 
-{
-  // Start serial 
-//  MSPSerial.begin(9600);
-  GPSSerial.begin(9600);
+void setup() {
 #ifdef PCSerial
   PCSerial.begin(115200);
 #endif
+  GPSSerial.begin(9600, SERIAL_8N1, 27, 26);
   MSPSerial.begin(115200);
-//  GPSSerial.begin(RATE);
 
   delay(2000);
 
@@ -48,21 +47,32 @@ void setup()
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
 #ifdef PCSerial
-  PCSerial.print("Connecting to WiFi");
+  PCSerial.print("==> Connecting to WiFi");
 #endif
-  while (WiFi.status() != WL_CONNECTED) 
-  {
+  int i = 0;
+  while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
 #ifdef PCSerial
-    PCSerial.print(WiFi.status());
     PCSerial.print(".");
 #endif
-  }
+    if(WiFi.status() == WL_CONNECTED) {
 #ifdef PCSerial
-  PCSerial.println();
-  PCSerial.println("Connected to WiFi");
-  PCSerial.println(WiFi.localIP());
+      PCSerial.println();
+      PCSerial.println("==> Connected to WiFi");
+      PCSerial.println(WiFi.localIP());
 #endif
+      break;
+    }
+    if(i > 10) {
+#ifdef PCSerial
+      PCSerial.println();
+      PCSerial.println("==> Cannot connect to WiFi");
+#endif
+      break;
+    }
+    i++;
+  }
+
   http_nom = new HTTPClient*;
   http_op = new HTTPClient*;
   *http_nom = new HTTPClient;
@@ -73,7 +83,7 @@ bool valid;
 
 void loop() {
   // Update GPS data
-  while (GPSSerial.available() > 0 && WiFi.status() == WL_CONNECTED) {
+  while (GPSSerial.available() > 0) {
     gps.encode(GPSSerial.read());
 //    Serial.println("Received data from gps");
   }
@@ -81,39 +91,51 @@ void loop() {
   valid = gps.satellites.value() > 0;
   while(MSPSerial.available()) {
     char c = MSPSerial.read();
-    String output;
-
-    if(gps.satellites.value() == 0) {
-      output = String("N/A");
-    } else switch (c){
-      case '0':
-        output = getAddress(gps.location.lat(), gps.location.lng());
-        break;
-      case '1':
-        output = String((int)gps.speed.kmph());
-        break;
-      case '2':
-        output = getRoadLimit(gps.location.lat(), gps.location.lng());
-        break;
-      case '3':
-        output = String(gps.location.lat());
-        break;
-      case '4':
-        output = String(gps.location.lng());
-        break;
-      default: 
-        output = "err";
-        break;
-    }
-    MSPSerial.print(c);
-    MSPSerial.println(output);
 #ifdef PCSerial
-    PCSerial.print(c);
+    PCSerial.print("==> Received request: ");
+    PCSerial.println(c);
+#endif
+    String output = requestDispatcher(c);
+    
+    MSPSerial.print(c);
+    MSPSerial.print(output);
+    MSPSerial.print('\n');
+#ifdef PCSerial
+    PCSerial.print("==> Sent to msp: ");
     PCSerial.println(output);
 #endif
   }
 
   delay(10);
+}
+
+String requestDispatcher(char c) {
+  if(gps.satellites.value() == 0) {
+#ifdef PCSerial
+    PCSerial.println("==> No GPS fix, returning N/A");
+#endif
+    return String("?");
+  }
+  if((c == '0' || c == '2') && WiFi.status() != WL_CONNECTED) {
+#ifdef PCSerial
+    PCSerial.println("==> No WiFi connection, returning N/A");
+#endif
+    return String("?");
+  }
+  switch (c){
+    case '0': // position
+      return getAddress(gps.location.lat(), gps.location.lng());
+    case '1': // speed
+      return String((int)gps.speed.kmph());
+    case '2': // limit
+//      return getRoadLimit(gps.location.lat(), gps.location.lng());
+      return getRoadLimit(gps.location.lat(), gps.location.lng());
+    case '3': // lat
+      return String(gps.location.lat(), 6);
+    case '4': // lon
+      return String(gps.location.lng(), 6);
+  }
+  return String("err");
 }
 
 String jsonRequest(Request method, HTTPClient **http_p, String url, String query = "") {
@@ -147,7 +169,7 @@ String jsonRequest(Request method, HTTPClient **http_p, String url, String query
 }
 
 String getRoadLimit(float latc, float lonc) {
-  DynamicJsonDocument doc(4096);
+  DynamicJsonDocument doc(DOCSIZE);
   float lat1, lat2, lon1, lon2;
   float delta = (float)BBOX_L / 111111 / 2;
 #ifdef PCSerial
@@ -193,7 +215,7 @@ String getRoadLimit(float latc, float lonc) {
 }
 
 String getAddress(float lat, float lon) {
-  DynamicJsonDocument doc(2048);
+  DynamicJsonDocument doc(DOCSIZE);
   DeserializationError error = deserializeJson(doc, jsonRequest(
     GET,
     http_nom,
