@@ -11,6 +11,6 @@ void update_value(request req);
 void interrupt_EUSCIA2__esp();
 void setup__esp();
 
-extern uint8_t can_request[5];
+extern uint8_t can_request;
 
 #endif //__ESP_H__

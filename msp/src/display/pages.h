@@ -24,5 +24,6 @@ void update_lon(uint8_t* lon);
 void update_tilt();
 void update_car_side(float y_axis);
 void update_car_front(float x_axis);
+extern volatile uint8_t rcount;
 
 #endif /* PAGES_H_ */

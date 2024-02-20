@@ -18,7 +18,7 @@ uint8_t lon[MAX_SIZE_COORDINATES];
 uint8_t speed[4];
 uint8_t speed_limit[4];
 
-uint8_t can_request[5] = {1, 1, 1, 1, 1};
+uint8_t can_request = 1;
 
 volatile request req = UNSET;
 
@@ -37,7 +37,7 @@ const eUSCI_UART_ConfigV1 uartConfig = {
 };
 
 void update_value(request req){
-    can_request[req - '0'] = 1;
+    can_request = 1;
     switch(req) {
         case ADDRESS:
             location_address[counter] = '\0';

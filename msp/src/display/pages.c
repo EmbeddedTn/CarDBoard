@@ -123,7 +123,7 @@ void draw_speed() {
     draw_title("Speed");
 
     Graphics_setFont(&g_sContext, &SPEED_FONT);
-    Graphics_drawStringCentered(&g_sContext, current_speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
+    Graphics_drawStringCentered(&g_sContext, (int8_t*)current_speed, AUTO_STRING_LENGTH, 50, 64, OPAQUE_TEXT);
 
     Graphics_setForegroundColor(&g_sContext, COLOR);
     Graphics_setBackgroundColor(&g_sContext, COLOR);
@@ -152,8 +152,8 @@ void draw_geolocation() {
 void draw_tilt() {
     Graphics_clearDisplay(&g_sContext);
     draw_title("Vehicle Tilt");
-    Graphics_drawImage(&g_sContext, &car_side, 10, 35);
-    Graphics_drawImage(&g_sContext, &car_front, 80, 35);
+    Graphics_drawImage(&g_sContext, &car_side, 80, 35);
+    Graphics_drawImage(&g_sContext, &car_front, 10, 35);
     int8_t x_accelerometer[8];
     int8_t y_accelerometer[8];
 
@@ -197,6 +197,7 @@ void draw_page() {
 // function called when buttons S1 or S2 are pressed
 void change_page(int8_t delta) {
     current_page_number = (current_page_number + delta + PAGES) % PAGES;
+    rcount = 0;
     draw_page();
 }
 
