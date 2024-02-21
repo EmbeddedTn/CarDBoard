@@ -4,6 +4,9 @@ Final project for Embedded Systems for the Internet of Things  [UniTn - 145996]
 ## Description
 Enhance your driving experience with this advanced car dashboard, meticulously crafted using an MSP432P401R microcontroller for precise calculations and an ESP32 for seamless internet connectivity. Harness the power of real-time location data from a GPS module to retrieve current speed limits, empowering you to stay informed and maintain responsible driving practices.
 
+## Showcase Video
+You can find the demo video [here](https://movies.prabo.org/MeTube/w?code=9j3-g6hEDcr)
+
 #### Key Features:
 
 - __Accurate Speed Limit Display__: Leverage GPS-acquired latitude and longitude to fetch local speed limits from online databases, ensuring compliance and enhancing road safety.
@@ -76,22 +79,23 @@ CarDBoard has a 4-tab graphical user interface. By moving the joystick to the le
 - [Reverse Geocoding for OpenStreetMap](https://nominatim.org/release-docs/develop/api/Reverse/)
 
 ### Contributions
-- [Filippo De Grandi](mailto:filippo.degrandi@studenti.unitn.it?subject=Embedded-project-infos):  
+- [Filippo De Grandi](mailto:filippo.degrandi@studenti.unitn.it?subject=Embedded-project-infos) ([@Degra02](https://github.com/Degra02/)):  
     Led project setup and initial configuration.  
     Developed graphical user interfaces for speed limit, speed, and geolocation sections.  
     Created API for dynamic screen updates based on ESP32 data.
 
-- [Lorenzo Bodini](mailto:lorenzo.bodini@studenti.unitn.it?subject=Embedded-project-infos):
+- [Lorenzo Bodini](mailto:lorenzo.bodini@studenti.unitn.it?subject=Embedded-project-infos) ([@topongo](https://github.com/topongo/)):  
     Migrated early stage of MSP codebase to a more organized structure, based on plug-and-play modules.
     Worked on the ESP32 code, in particular:
     - UART communication with the MSP module and the creation of custom queries for the Overpass-Turbo API;
     - WiFi and GPS connectivity, using integrated WiFi module on the ESP32, a mobile hotspot and an external GPS module.
     Planning to upgrade the WiFi connectivity to a SIM module, for GSM based networking, to avoid mobile hotspots.
+    Created the showcase video.
 
-- [Lorenzo Pattaro Zonta](mailto:lorenzo.pattarozonta@studenti.unitn.it?subject=Embedded-project-infos):
+- [Lorenzo Pattaro Zonta](mailto:lorenzo.pattarozonta@studenti.unitn.it?subject=Embedded-project-infos) ([@lyreplus](https://github.com/lyreplus/)):  
     Developed and tested the tilt functionality utilizing the Booster Pack's accelerometer. Established an appropriate input range.
     Designed and implemented a dedicated tilt graphics page for intuitive user interaction.
     Established and integrated UART communication protocol on the MSP board, in collaboration with the other members of the team.
 
-- [Elia Zonta](mailto:elia.zonta@studenti.unitn.it?subject=Embedded-project-infos):
+- [Elia Zonta](mailto:elia.zonta@studenti.unitn.it?subject=Embedded-project-infos) ([@eliazonta](https://github.com/eliazonta/)):  
 
