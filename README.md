@@ -62,8 +62,14 @@ Enhance your driving experience with this advanced car dashboard, meticulously c
 - [Overpass Turbo](https://overpass-turbo.eu/)
 - [Reverse Geocoding for OpenStreetMap](https://nominatim.org/release-docs/develop/api/Reverse/)
 
-### Authors
-- [Lorenzo Bodini](mailto:lorenzo.bodini@studenti.unitn.it?subject=Embedded-project-infos)
-- [Filippo De Grandi](mailto:filippo.degrandi@studenti.unitn.it?subject=Embedded-project-infos)
-- [Lorenzo Pattaro Zonta](mailto:lorenzo.pattarozonta@studenti.unitn.it?subject=Embedded-project-infos)
-- [Elia Zonta](mailto:elia.zonta@studenti.unitn.it?subject=Embedded-project-infos)
+### Contributions
+- [Filippo De Grandi](mailto:filippo.degrandi@studenti.unitn.it?subject=Embedded-project-infos):  
+    Led project setup and initial configuration.  
+    Developed graphical user interfaces for speed limit, speed, and geolocation sections.  
+    Created API for dynamic screen updates based on ESP32 data.
+- [Lorenzo Bodini](mailto:lorenzo.bodini@studenti.unitn.it?subject=Embedded-project-infos):
+
+- [Lorenzo Pattaro Zonta](mailto:lorenzo.pattarozonta@studenti.unitn.it?subject=Embedded-project-infos):
+
+- [Elia Zonta](mailto:elia.zonta@studenti.unitn.it?subject=Embedded-project-infos):
+
