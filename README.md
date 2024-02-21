@@ -13,12 +13,11 @@ Enhance your driving experience with this advanced car dashboard, meticulously c
 
 CarDBoard has a 4-tab graphical user interface. By moving the joystick to the left or to the right you will be able to view the following tabs:
 
-- Speed Limit: a street sign showing the speed limit of the road being travelled
-- Vehichle speed: Speed of the vehicle and a colored indicator to know whether the car is below or above the speed limit
-- Tilt: car tilting between the x-axis or the y-axis according to the sensor on the Boosterpack board
-- Geolocation: real time visualization of the geographic coordinates (latitude and longitude) and address based on the GPS sensor and the OpenStreetMap API.
+- __Speed Limit__: a street sign showing the speed limit of the road being travelled
+- __Vehichle speed__: Speed of the vehicle and a colored indicator to know whether the car is below or above the speed limit
+- __Tilt__: car tilting below the x-axis or the y-axis according to the sensor on the Boosterpack board
+- __Geolocation__: real time visualization of the geographic coordinates (latitude and longitude)
 
-Moreover a LED on the Boosterpack will show whether there is currently UART communication between the MSP and the ESP board.
 
 ## Hardware Components:
 
