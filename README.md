@@ -9,6 +9,16 @@ Enhance your driving experience with this advanced car dashboard, meticulously c
 - __Accurate Speed Limit Display__: Leverage GPS-acquired latitude and longitude to fetch local speed limits from online databases, ensuring compliance and enhancing road safety.
 - __Intuitive User Interface__: Visually appealing and user-friendly interface that clearly displays essential information like current speed, speed limit, location name, and more.
 
+## Usage
+
+CarDBoard has a 4-tab graphical user interface. By moving the joystick to the left or to the right you will be able to view the following tabs:
+
+- Speed Limit: a street sign showing the speed limit of the road being travelled
+- Vehichle speed: Speed of the vehicle and a colored indicator to know whether the car is below or above the speed limit
+- Tilt: car tilting between the x-axis or the y-axis according to the sensor on the Boosterpack board
+- Geolocation: real time visualization of the geographic coordinates (latitude and longitude) and address based on the GPS sensor and the OpenStreetMap API.
+
+Moreover a LED on the Boosterpack will show whether there is currently UART communication between the MSP and the ESP board.
 
 ## Hardware Components:
 
