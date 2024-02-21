@@ -80,7 +80,13 @@ CarDBoard has a 4-tab graphical user interface. By moving the joystick to the le
     Led project setup and initial configuration.  
     Developed graphical user interfaces for speed limit, speed, and geolocation sections.  
     Created API for dynamic screen updates based on ESP32 data.
+
 - [Lorenzo Bodini](mailto:lorenzo.bodini@studenti.unitn.it?subject=Embedded-project-infos):
+    Migrated early stage of MSP codebase to a more organized structure, based on plug-and-play modules.
+    Worked on the ESP32 code, in particular:
+    - UART communication with the MSP module and the creation of custom queries for the Overpass-Turbo API;
+    - WiFi and GPS connectivity, using integrated WiFi module on the ESP32, a mobile hotspot and an external GPS module.
+    Planning to upgrade the WiFi connectivity to a SIM module, for GSM based networking, to avoid mobile hotspots.
 
 - [Lorenzo Pattaro Zonta](mailto:lorenzo.pattarozonta@studenti.unitn.it?subject=Embedded-project-infos):
     Developed and tested the tilt functionality utilizing the Booster Pack's accelerometer. Established an appropriate input range.
