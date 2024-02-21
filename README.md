@@ -70,6 +70,9 @@ Enhance your driving experience with this advanced car dashboard, meticulously c
 - [Lorenzo Bodini](mailto:lorenzo.bodini@studenti.unitn.it?subject=Embedded-project-infos):
 
 - [Lorenzo Pattaro Zonta](mailto:lorenzo.pattarozonta@studenti.unitn.it?subject=Embedded-project-infos):
+    Developed and tested the tilt functionality utilizing the Booster Pack's accelerometer. Established an appropriate input range.
+    Designed and implemented a dedicated tilt graphics page for intuitive user interaction.
+    Established and integrated UART communication protocol on the MSP board, in collaboration with the other members of the team.
 
 - [Elia Zonta](mailto:elia.zonta@studenti.unitn.it?subject=Embedded-project-infos):
 
