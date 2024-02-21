@@ -3,6 +3,10 @@
 
 #include <ti/grlib/grlib.h>
 
+/*
+ * File containing all the car_front images displayed
+ * when tilting.
+ */
 extern const Graphics_Image car_front_output__45;
 extern const Graphics_Image car_front_output__40;
 extern const Graphics_Image car_front_output__35;
@@ -21,7 +25,5 @@ extern const Graphics_Image car_front_output_20;
 extern const Graphics_Image car_front_output_15;
 extern const Graphics_Image car_front_output_10;
 extern const Graphics_Image car_front_output_5;
-
-
 
 #endif /* INCLUDE_CAR_FRONT_H_ */

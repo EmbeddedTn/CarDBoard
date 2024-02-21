@@ -2,8 +2,8 @@
 #define __MODS_H__
 
 #include "display/display.h"
-#include "tilt/tilt.h"
 #include "esp/esp.h"
+#include "tilt/tilt.h"
 
 #include "utils.h"
 
@@ -29,7 +29,5 @@ void (*INTERRUPTS_TA2_0[N_INTERRUPTS_TA2_0])(void) = {
 void (*INTERRUPTS_EUSCIA2[N_INTERRUPTS_EUSCIA2])(void) = {
     interrupt_EUSCIA2__esp,
 };
-
-
 
 #endif
