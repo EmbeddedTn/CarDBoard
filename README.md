@@ -1,4 +1,4 @@
-# Car Dashboard
+# Car DashBoard
 Final project for Embedded Systems for the Internet of Things  [UniTn - 145996]
 
 ## Description
