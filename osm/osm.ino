@@ -11,6 +11,7 @@
 #define OVERPASS_QUERY2 "); out;"
 #define BBOX_L 20
 #define DOCSIZE 8192
+#define GPS_DEBUG
 
 enum Request {
   POST,
@@ -26,6 +27,11 @@ HardwareSerial GPSSerial(1);
 TinyGPSPlus gps;
 HTTPClient** http_nom;
 HTTPClient** http_op;
+#ifdef GPS_DEBUG
+float db_lat, db_lon;
+int db_speed;
+String cmd;
+#endif
 
 void setup() {
 #ifdef PCSerial
@@ -70,9 +76,14 @@ void setup() {
   http_op = new HTTPClient*;
   *http_nom = new HTTPClient;
   *http_op = new HTTPClient;
+  
+#ifdef GPS_DEBUG
+  db_lat = 46.06477;
+  db_lon = 11.14300;
+  db_speed = 50;
+  PCSerial.println("==> Enabled GPS Debug <==");
+#endif
 }
-
-bool valid;
 
 void loop() {
   // Update GPS data
@@ -81,7 +92,41 @@ void loop() {
 //    Serial.println("Received data from gps");
   }
 
-  valid = gps.satellites.value() > 0;
+#ifdef GPS_DEBUG
+  if(PCSerial.available()) {
+    char r = PCSerial.read();
+    PCSerial.print("==> Received GPS debug command: ");
+    PCSerial.println(r);
+    switch(r) {
+      case 'o':
+        cmd = PCSerial.readStringUntil('\n');
+        if(cmd != NULL) {
+          db_lon = cmd.toFloat();
+        }
+        break;
+      case 'a':
+        cmd = PCSerial.readStringUntil('\n');
+        if(cmd != NULL) {
+          db_lat = cmd.toFloat();
+        }
+        break;
+      case 's':
+        cmd = PCSerial.readStringUntil('\n');
+        if(cmd != NULL) {
+          db_speed = cmd.toInt();
+        }
+        break;
+    }
+    PCSerial.println("==> New debug values:\n  Latitude: ");
+    PCSerial.println(db_lat);
+    PCSerial.print("  Longitude: ");
+    PCSerial.println(db_lon);
+    PCSerial.print("  Speed: ");
+    PCSerial.println(db_speed);
+    PCSerial.println("==>");
+  }
+#endif
+
   while(MSPSerial.available()) {
     char c = MSPSerial.read();
 #ifdef PCSerial
@@ -103,30 +148,44 @@ void loop() {
 }
 
 String requestDispatcher(char c) {
+#ifndef GPS_DEBUG
   if(gps.satellites.value() == 0) {
 #ifdef PCSerial
     PCSerial.println("==> No GPS fix, returning N/A");
-#endif
+#endif // PCSerial
     return String("?");
   }
+#endif // GPS_DEBUG
   if((c == '0' || c == '2') && WiFi.status() != WL_CONNECTED) {
 #ifdef PCSerial
     PCSerial.println("==> No WiFi connection, returning N/A");
-#endif
+#endif // PCSerial
     return String("?");
   }
+
+  float lat, lon;
+  int spd;
+#ifdef GPS_DEBUG
+  lat = db_lat;
+  lon = db_lon;
+  spd = db_speed;
+#else
+  lat = gps.location.lat();
+  lon = gps.location.lng();
+  spd = (int)gps.speed.kmph();
+#endif
   switch (c){
     case '0': // position
-      return getAddress(gps.location.lat(), gps.location.lng());
+      return getAddress(lat, lon);
     case '1': // speed
-      return String((int)gps.speed.kmph());
+      return String(spd);
     case '2': // limit
 //      return getRoadLimit(gps.location.lat(), gps.location.lng());
-      return getRoadLimit(gps.location.lat(), gps.location.lng());
+      return getRoadLimit(lat, lon);
     case '3': // lat
-      return String(gps.location.lat(), 6);
+      return String(lat, 6);
     case '4': // lon
-      return String(gps.location.lng(), 6);
+      return String(lon, 6);
   }
   return String("err");
 }

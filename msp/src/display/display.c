@@ -14,6 +14,7 @@ extern volatile uint8_t current_page_number;
 void setup__display() {
   srand(time(0));
   init_all();
+  draw_page(0);
 
   car_side_init();
   car_front_init();
