@@ -80,9 +80,9 @@ CarDBoard has a 4-tab graphical user interface. By moving the joystick to the le
 
 ### Contributions
 - [Filippo De Grandi](mailto:filippo.degrandi@studenti.unitn.it?subject=Embedded-project-infos) ([@Degra02](https://github.com/Degra02/)):  
-    Led project setup and initial configuration.  
-    Developed graphical user interfaces for speed limit, speed, and geolocation sections.  
-    Created API for dynamic screen updates based on ESP32 data.
+    Led project setup and initial configuration, setting the basis for project development, including system initialization.  
+    Developed graphical user interfaces for speed limit, speed, and geolocation sections, and implemented main methods of navigating thorugh the various pages.  
+    Created API for dynamic screen updates based on ESP32 data, to be used after requests are made to the microcontroller.
 
 - [Lorenzo Bodini](mailto:lorenzo.bodini@studenti.unitn.it?subject=Embedded-project-infos) ([@topongo](https://github.com/topongo/)):  
     Migrated early stage of MSP codebase to a more organized structure, based on plug-and-play modules.
