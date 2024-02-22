@@ -1,13 +1,29 @@
-# Car Dashboard
+# Car DashBoard
 Final project for Embedded Systems for the Internet of Things  [UniTn - 145996]
 
 ## Description
 Enhance your driving experience with this advanced car dashboard, meticulously crafted using an MSP432P401R microcontroller for precise calculations and an ESP32 for seamless internet connectivity. Harness the power of real-time location data from a GPS module to retrieve current speed limits, empowering you to stay informed and maintain responsible driving practices.
 
+## Showcase Video
+You can find the demo video [here](https://movies.prabo.org/MeTube/w?code=9j3-g6hEDcr)
+
 #### Key Features:
 
 - __Accurate Speed Limit Display__: Leverage GPS-acquired latitude and longitude to fetch local speed limits from online databases, ensuring compliance and enhancing road safety.
 - __Intuitive User Interface__: Visually appealing and user-friendly interface that clearly displays essential information like current speed, speed limit, location name, and more.
+
+![](Tilting.png)
+
+## Usage
+
+CarDBoard has a 4-tab graphical user interface. By moving the joystick to the left or to the right you will be able to view the following tabs:
+
+- __Speed Limit__: a street sign showing the speed limit of the road being travelled
+- __Vehichle speed__: Speed of the vehicle and a colored indicator to know whether the car is below or above the speed limit
+- __Tilt__: car tilting below the x-axis or the y-axis according to the sensor on the Boosterpack board
+- __Geolocation__: real time visualization of the geographic coordinates (latitude and longitude)
+
+![](speed_limit.png)
 
 
 ## Hardware Components:
@@ -63,16 +79,26 @@ Enhance your driving experience with this advanced car dashboard, meticulously c
 - [Reverse Geocoding for OpenStreetMap](https://nominatim.org/release-docs/develop/api/Reverse/)
 
 ### Contributions
-- [Filippo De Grandi](mailto:filippo.degrandi@studenti.unitn.it?subject=Embedded-project-infos):  
-    Led project setup and initial configuration.  
-    Developed graphical user interfaces for speed limit, speed, and geolocation sections.  
-    Created API for dynamic screen updates based on ESP32 data.
-- [Lorenzo Bodini](mailto:lorenzo.bodini@studenti.unitn.it?subject=Embedded-project-infos):
+- [Filippo De Grandi](mailto:filippo.degrandi@studenti.unitn.it?subject=Embedded-project-infos) ([@Degra02](https://github.com/Degra02/)):  
+    Led project setup and initial configuration, setting the basis for project development, including system initialization.  
+    Developed graphical user interfaces for speed limit, speed, and geolocation sections, and implemented main methods of navigating thorugh the various pages.  
+    Created API for dynamic screen updates based on ESP32 data, to be used after requests are made to the microcontroller.
 
-- [Lorenzo Pattaro Zonta](mailto:lorenzo.pattarozonta@studenti.unitn.it?subject=Embedded-project-infos):
+- [Lorenzo Bodini](mailto:lorenzo.bodini@studenti.unitn.it?subject=Embedded-project-infos) ([@topongo](https://github.com/topongo/)):  
+    Migrated early stage of MSP codebase to a more organized structure, based on plug-and-play modules.
+    Worked on the ESP32 code, in particular:
+    - UART communication with the MSP module and the creation of custom queries for the Overpass-Turbo API;
+    - WiFi and GPS connectivity, using integrated WiFi module on the ESP32, a mobile hotspot and an external GPS module.
+    Planning to upgrade the WiFi connectivity to a SIM module, for GSM based networking, to avoid mobile hotspots.
+    Created the showcase video.
+
+- [Lorenzo Pattaro Zonta](mailto:lorenzo.pattarozonta@studenti.unitn.it?subject=Embedded-project-infos) ([@lyreplus](https://github.com/lyreplus/)):  
     Developed and tested the tilt functionality utilizing the Booster Pack's accelerometer. Established an appropriate input range.
     Designed and implemented a dedicated tilt graphics page for intuitive user interaction.
     Established and integrated UART communication protocol on the MSP board, in collaboration with the other members of the team.
 
-- [Elia Zonta](mailto:elia.zonta@studenti.unitn.it?subject=Embedded-project-infos):
+- [Elia Zonta](mailto:elia.zonta@studenti.unitn.it?subject=Embedded-project-infos) ([@eliazonta](https://github.com/eliazonta/)):  
+    Developed connection between ESP32 board and OpenStreetMap API throught Nominatim reverse geocoding to retrieve required informations to be sent to the MSP board.
+    Initially worked on a UART comminication between MSP board and the GPS module that later on has been switched to the ESP32 making easier the implementation and requiring less communication overhead in the MSP board.
+    Created the presentation slides.
 

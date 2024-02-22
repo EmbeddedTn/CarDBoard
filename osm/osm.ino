@@ -3,14 +3,8 @@
 #include <ArduinoJson.h>
 #include <TinyGPS++.h>
 #include <HardwareSerial.h>
+#include "secrets.h"
 
-const char* ssid = "wireless-ext";
-const char* password = "cassonetto5";
-
-//Your Domain name with URL path or IP address with path
-// const char* serverName = "http://192.168.1.106:1880/get-sensor";
-
-// see : "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=-34.44076&lon=-58.70521";
 #define NOMINATIM_URL "https://nominatim.openstreetmap.org/reverse?format=jsonv2"
 #define OVERPASS_URL "http://overpass-api.de/api/interpreter"
 #define OVERPASS_QUERY1 "[out:json][maxsize:20000]; way[highway][highway!~\"(footway|track|cycleway|steps|pedestrian|construction)\"][access!~\"(no|private)\"]("
@@ -29,7 +23,6 @@ HardwareSerial GPSSerial(1);
 #define PCSerial Serial
 #define RATE 9600
 
-// Define TinyGPS++ object
 TinyGPSPlus gps;
 HTTPClient** http_nom;
 HTTPClient** http_op;
