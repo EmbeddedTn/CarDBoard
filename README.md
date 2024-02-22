@@ -98,4 +98,7 @@ CarDBoard has a 4-tab graphical user interface. By moving the joystick to the le
     Established and integrated UART communication protocol on the MSP board, in collaboration with the other members of the team.
 
 - [Elia Zonta](mailto:elia.zonta@studenti.unitn.it?subject=Embedded-project-infos) ([@eliazonta](https://github.com/eliazonta/)):  
+    Developed connection between ESP32 board and OpenStreetMap API throught Nominatim reverse geocoding to retrieve required informations to be sent to the MSP board.
+    Initially worked on a UART comminication between MSP board and the GPS module that later on has been switched to the ESP32 making easier the implementation and requiring less communication overhead in the MSP board.
+    Created the presentation slides.
 
